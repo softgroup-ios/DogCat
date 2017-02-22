@@ -7,19 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		842AAF4C1E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 842AAF491E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m */; };
+		842AAF4D1E5DACDE00B7B3ED /* GreedoSizeCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 842AAF4B1E5DACDE00B7B3ED /* GreedoSizeCalculator.m */; };
 		84D135741E5C8F02007BE924 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135731E5C8F02007BE924 /* main.m */; };
 		84D135771E5C8F02007BE924 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135761E5C8F02007BE924 /* AppDelegate.m */; };
 		84D1357D1E5C8F02007BE924 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D1357B1E5C8F02007BE924 /* Main.storyboard */; };
 		84D1357F1E5C8F02007BE924 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84D1357E1E5C8F02007BE924 /* Assets.xcassets */; };
 		84D135821E5C8F02007BE924 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D135801E5C8F02007BE924 /* LaunchScreen.storyboard */; };
 		84D1358E1E5C8FFC007BE924 /* GoogleImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1358B1E5C8FFC007BE924 /* GoogleImages.m */; };
-		84D1358F1E5C8FFC007BE924 /* ImageObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1358D1E5C8FFC007BE924 /* ImageObject.m */; };
-		84D135931E5C900C007BE924 /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135921E5C900C007BE924 /* TableViewController.m */; };
 		84D135961E5C939F007BE924 /* BreedCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135951E5C939F007BE924 /* BreedCollectionView.m */; };
 		84D135991E5C9C5D007BE924 /* BreedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135981E5C9C5D007BE924 /* BreedCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		842AAF481E5DACDE00B7B3ED /* GreedoCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GreedoCollectionViewLayout.h; sourceTree = "<group>"; };
+		842AAF491E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GreedoCollectionViewLayout.m; sourceTree = "<group>"; };
+		842AAF4A1E5DACDE00B7B3ED /* GreedoSizeCalculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GreedoSizeCalculator.h; sourceTree = "<group>"; };
+		842AAF4B1E5DACDE00B7B3ED /* GreedoSizeCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GreedoSizeCalculator.m; sourceTree = "<group>"; };
 		84D1356F1E5C8F02007BE924 /* BreedFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreedFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84D135731E5C8F02007BE924 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		84D135751E5C8F02007BE924 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -30,10 +34,6 @@
 		84D135831E5C8F02007BE924 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84D1358A1E5C8FFC007BE924 /* GoogleImages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GoogleImages.h; path = Models/GoogleImages.h; sourceTree = "<group>"; };
 		84D1358B1E5C8FFC007BE924 /* GoogleImages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GoogleImages.m; path = Models/GoogleImages.m; sourceTree = "<group>"; };
-		84D1358C1E5C8FFC007BE924 /* ImageObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageObject.h; path = Models/ImageObject.h; sourceTree = "<group>"; };
-		84D1358D1E5C8FFC007BE924 /* ImageObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ImageObject.m; path = Models/ImageObject.m; sourceTree = "<group>"; };
-		84D135911E5C900C007BE924 /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = Views/TableViewController.h; sourceTree = "<group>"; };
-		84D135921E5C900C007BE924 /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TableViewController.m; path = Views/TableViewController.m; sourceTree = "<group>"; };
 		84D135941E5C939F007BE924 /* BreedCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedCollectionView.h; path = Views/BreedCollectionView.h; sourceTree = "<group>"; };
 		84D135951E5C939F007BE924 /* BreedCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BreedCollectionView.m; path = Views/BreedCollectionView.m; sourceTree = "<group>"; };
 		84D135971E5C9C5D007BE924 /* BreedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedCell.h; path = Views/BreedCell.h; sourceTree = "<group>"; };
@@ -51,6 +51,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		842AAF461E5DACC100B7B3ED /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				842AAF471E5DACDE00B7B3ED /* GreedoLayout */,
+			);
+			name = libs;
+			sourceTree = "<group>";
+		};
+		842AAF471E5DACDE00B7B3ED /* GreedoLayout */ = {
+			isa = PBXGroup;
+			children = (
+				842AAF481E5DACDE00B7B3ED /* GreedoCollectionViewLayout.h */,
+				842AAF491E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m */,
+				842AAF4A1E5DACDE00B7B3ED /* GreedoSizeCalculator.h */,
+				842AAF4B1E5DACDE00B7B3ED /* GreedoSizeCalculator.m */,
+			);
+			name = GreedoLayout;
+			path = libs/GreedoLayout;
+			sourceTree = "<group>";
+		};
 		84D135661E5C8F02007BE924 = {
 			isa = PBXGroup;
 			children = (
@@ -70,6 +90,7 @@
 		84D135711E5C8F02007BE924 /* BreedFinder */ = {
 			isa = PBXGroup;
 			children = (
+				842AAF461E5DACC100B7B3ED /* libs */,
 				84D135901E5C9005007BE924 /* Views */,
 				84D135891E5C8FF3007BE924 /* Models */,
 				84D135751E5C8F02007BE924 /* AppDelegate.h */,
@@ -96,8 +117,6 @@
 			children = (
 				84D1358A1E5C8FFC007BE924 /* GoogleImages.h */,
 				84D1358B1E5C8FFC007BE924 /* GoogleImages.m */,
-				84D1358C1E5C8FFC007BE924 /* ImageObject.h */,
-				84D1358D1E5C8FFC007BE924 /* ImageObject.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -105,8 +124,6 @@
 		84D135901E5C9005007BE924 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				84D135911E5C900C007BE924 /* TableViewController.h */,
-				84D135921E5C900C007BE924 /* TableViewController.m */,
 				84D135941E5C939F007BE924 /* BreedCollectionView.h */,
 				84D135951E5C939F007BE924 /* BreedCollectionView.m */,
 				84D135971E5C9C5D007BE924 /* BreedCell.h */,
@@ -146,6 +163,7 @@
 				TargetAttributes = {
 					84D1356E1E5C8F02007BE924 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = LE3554D3R2;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -187,11 +205,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				84D135771E5C8F02007BE924 /* AppDelegate.m in Sources */,
+				842AAF4D1E5DACDE00B7B3ED /* GreedoSizeCalculator.m in Sources */,
 				84D1358E1E5C8FFC007BE924 /* GoogleImages.m in Sources */,
-				84D1358F1E5C8FFC007BE924 /* ImageObject.m in Sources */,
+				842AAF4C1E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m in Sources */,
 				84D135961E5C939F007BE924 /* BreedCollectionView.m in Sources */,
 				84D135991E5C9C5D007BE924 /* BreedCell.m in Sources */,
-				84D135931E5C900C007BE924 /* TableViewController.m in Sources */,
 				84D135741E5C8F02007BE924 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +330,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = LE3554D3R2;
 				INFOPLIST_FILE = BreedFinder/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.softgroup.BreedFinder;
@@ -323,6 +342,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = LE3554D3R2;
 				INFOPLIST_FILE = BreedFinder/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.softgroup.BreedFinder;
@@ -349,6 +369,7 @@
 				84D135881E5C8F02007BE924 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

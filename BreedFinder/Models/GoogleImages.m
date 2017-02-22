@@ -68,7 +68,6 @@
         
         NSString* image = [self.allGooglePage substringWithRange:imageRange];
         [array addObject:image];
-        
         nextRange = NSMakeRange(imageEndRange.location, self.allGooglePage.length - imageEndRange.location - 1);
     }
     //"ou":"   \"ou\":\"

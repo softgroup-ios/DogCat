@@ -10,9 +10,6 @@
 
 @implementation BreedCell
 
-- (void) awakeFromNib {
-    [super awakeFromNib];
-    
-}
+
 
 @end

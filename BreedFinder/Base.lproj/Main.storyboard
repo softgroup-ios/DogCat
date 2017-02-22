@@ -14,7 +14,7 @@
         <scene sceneID="jMn-aZ-1F0">
             <objects>
                 <collectionViewController id="8Zh-KW-7Bt" customClass="BreedCollectionView" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" id="fo2-23-Cn5">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="fo2-23-Cn5">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -55,7 +55,7 @@
                         </connections>
                     </collectionView>
                     <navigationItem key="navigationItem" prompt="Breed" id="oUw-za-gfp">
-                        <barButtonItem key="leftBarButtonItem" image="dog-icon" style="plain" id="l3N-Ag-loA">
+                        <barButtonItem key="leftBarButtonItem" image="dog-icon" style="done" id="l3N-Ag-loA">
                             <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="showPopout:" destination="8Zh-KW-7Bt" id="yDd-mA-d0t"/>
