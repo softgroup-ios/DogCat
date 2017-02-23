@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		842812A61E5EDAFB00891079 /* FullScreenVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 842812A51E5EDAFB00891079 /* FullScreenVC.m */; };
+		842812AD1E5EDD9A00891079 /* PickBreedsTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 842812AC1E5EDD9A00891079 /* PickBreedsTableVC.m */; };
+		842812B01E5EDDB700891079 /* BreedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 842812AF1E5EDDB700891079 /* BreedCell.m */; };
 		842AAF4C1E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 842AAF491E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m */; };
 		842AAF4D1E5DACDE00B7B3ED /* GreedoSizeCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 842AAF4B1E5DACDE00B7B3ED /* GreedoSizeCalculator.m */; };
 		84D135741E5C8F02007BE924 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135731E5C8F02007BE924 /* main.m */; };
@@ -16,10 +19,15 @@
 		84D135821E5C8F02007BE924 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D135801E5C8F02007BE924 /* LaunchScreen.storyboard */; };
 		84D1358E1E5C8FFC007BE924 /* GoogleImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1358B1E5C8FFC007BE924 /* GoogleImages.m */; };
 		84D135961E5C939F007BE924 /* BreedCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135951E5C939F007BE924 /* BreedCollectionView.m */; };
-		84D135991E5C9C5D007BE924 /* BreedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135981E5C9C5D007BE924 /* BreedCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		842812A41E5EDAFB00891079 /* FullScreenVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FullScreenVC.h; path = Views/FullScreenVC.h; sourceTree = "<group>"; };
+		842812A51E5EDAFB00891079 /* FullScreenVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FullScreenVC.m; path = Views/FullScreenVC.m; sourceTree = "<group>"; };
+		842812AB1E5EDD9A00891079 /* PickBreedsTableVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PickBreedsTableVC.h; path = Views/PickBreedsTableVC.h; sourceTree = "<group>"; };
+		842812AC1E5EDD9A00891079 /* PickBreedsTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PickBreedsTableVC.m; path = Views/PickBreedsTableVC.m; sourceTree = "<group>"; };
+		842812AE1E5EDDB700891079 /* BreedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedCell.h; path = Cells/BreedCell.h; sourceTree = "<group>"; };
+		842812AF1E5EDDB700891079 /* BreedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BreedCell.m; path = Cells/BreedCell.m; sourceTree = "<group>"; };
 		842AAF481E5DACDE00B7B3ED /* GreedoCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GreedoCollectionViewLayout.h; sourceTree = "<group>"; };
 		842AAF491E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GreedoCollectionViewLayout.m; sourceTree = "<group>"; };
 		842AAF4A1E5DACDE00B7B3ED /* GreedoSizeCalculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GreedoSizeCalculator.h; sourceTree = "<group>"; };
@@ -36,8 +44,6 @@
 		84D1358B1E5C8FFC007BE924 /* GoogleImages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GoogleImages.m; path = Models/GoogleImages.m; sourceTree = "<group>"; };
 		84D135941E5C939F007BE924 /* BreedCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedCollectionView.h; path = Views/BreedCollectionView.h; sourceTree = "<group>"; };
 		84D135951E5C939F007BE924 /* BreedCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BreedCollectionView.m; path = Views/BreedCollectionView.m; sourceTree = "<group>"; };
-		84D135971E5C9C5D007BE924 /* BreedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedCell.h; path = Views/BreedCell.h; sourceTree = "<group>"; };
-		84D135981E5C9C5D007BE924 /* BreedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BreedCell.m; path = Views/BreedCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +57,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		842812AA1E5EDD5F00891079 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				842812AE1E5EDDB700891079 /* BreedCell.h */,
+				842812AF1E5EDDB700891079 /* BreedCell.m */,
+			);
+			name = Cells;
+			sourceTree = "<group>";
+		};
 		842AAF461E5DACC100B7B3ED /* libs */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,6 +105,7 @@
 		84D135711E5C8F02007BE924 /* BreedFinder */ = {
 			isa = PBXGroup;
 			children = (
+				842812AA1E5EDD5F00891079 /* Cells */,
 				842AAF461E5DACC100B7B3ED /* libs */,
 				84D135901E5C9005007BE924 /* Views */,
 				84D135891E5C8FF3007BE924 /* Models */,
@@ -126,8 +142,10 @@
 			children = (
 				84D135941E5C939F007BE924 /* BreedCollectionView.h */,
 				84D135951E5C939F007BE924 /* BreedCollectionView.m */,
-				84D135971E5C9C5D007BE924 /* BreedCell.h */,
-				84D135981E5C9C5D007BE924 /* BreedCell.m */,
+				842812A41E5EDAFB00891079 /* FullScreenVC.h */,
+				842812A51E5EDAFB00891079 /* FullScreenVC.m */,
+				842812AB1E5EDD9A00891079 /* PickBreedsTableVC.h */,
+				842812AC1E5EDD9A00891079 /* PickBreedsTableVC.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -209,7 +227,9 @@
 				84D1358E1E5C8FFC007BE924 /* GoogleImages.m in Sources */,
 				842AAF4C1E5DACDE00B7B3ED /* GreedoCollectionViewLayout.m in Sources */,
 				84D135961E5C939F007BE924 /* BreedCollectionView.m in Sources */,
-				84D135991E5C9C5D007BE924 /* BreedCell.m in Sources */,
+				842812A61E5EDAFB00891079 /* FullScreenVC.m in Sources */,
+				842812B01E5EDDB700891079 /* BreedCell.m in Sources */,
+				842812AD1E5EDD9A00891079 /* PickBreedsTableVC.m in Sources */,
 				84D135741E5C8F02007BE924 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

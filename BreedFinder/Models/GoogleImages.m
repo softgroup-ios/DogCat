@@ -12,11 +12,11 @@
 
 
 @property (nonatomic,strong) NSArray* arrayOfCurrentImages;
-@property (nonatomic,strong,nullable) void(^afterBlock)(NSArray*);
+@property (nonatomic,strong,nullable) void(^finishBlock)(NSArray*);
 @property (nonatomic,strong) UIWebView* webView;
 @property (nonatomic,strong) NSString* allGooglePage;
 
-@property (nonatomic,assign) BOOL isParse;
+
 @end
 
 @implementation GoogleImages
@@ -33,18 +33,22 @@
         dispatch_async(queue,^{
             self.arrayOfBreeds = [self downloadAndParseWikiPage];
             self.isParse = YES;
+            if(self.imagesReady) {
+                self.imagesReady(self.arrayOfBreeds);
+            }
             self.allGooglePage = nil;
         });
     }
     return self;
 }
 
-- (void) searchImages: (NSString*) text afterBlock: (void(^)(NSArray*)) block
+- (void) searchImages: (NSString*)text
+          finishBlock: (void(^)(NSArray* array))finishBlock
 {
+    self.finishBlock = finishBlock;
     NSArray* arrayOfStrings = [text componentsSeparatedByString:@" "];
     NSString* searchText = [arrayOfStrings componentsJoinedByString:@"+"];
     [self loadGoogleImageFromText:searchText];
-    self.afterBlock = block;
 }
 
 -(NSArray*) searchGoogleImagesInCurrentHTML
@@ -115,7 +119,6 @@
                 startFrom = breedRange.location + breedRange.length;
             }
         }
-        
     }
     return array;
 }
@@ -137,7 +140,8 @@
     
     self.allGooglePage = [self.webView stringByEvaluatingJavaScriptFromString:javaScriptCode];
     
-    self.afterBlock([self searchGoogleImagesInCurrentHTML]);
+    NSArray *array = [self searchGoogleImagesInCurrentHTML];
+    self.finishBlock(array);
 }
 
 

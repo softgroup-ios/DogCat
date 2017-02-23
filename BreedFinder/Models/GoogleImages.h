@@ -11,7 +11,11 @@
 
 @interface GoogleImages : NSObject
 
-@property (nonatomic,strong) NSArray* arrayOfBreeds;
+@property (strong, nonatomic) NSArray* arrayOfBreeds;
+@property (assign, nonatomic) BOOL isParse;
 
-- (void) searchImages: (NSString*) text afterBlock: (void(^)(NSArray* array)) block;
+@property (copy, nonatomic) void(^imagesReady)(NSArray* array);
+
+- (void) searchImages: (NSString*)text
+          finishBlock: (void(^)(NSArray* array))finishBlock;
 @end

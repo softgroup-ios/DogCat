@@ -54,7 +54,7 @@
                             <outlet property="delegate" destination="8Zh-KW-7Bt" id="its-eW-ZyF"/>
                         </connections>
                     </collectionView>
-                    <navigationItem key="navigationItem" prompt="Breed" id="oUw-za-gfp">
+                    <navigationItem key="navigationItem" id="oUw-za-gfp">
                         <barButtonItem key="leftBarButtonItem" image="dog-icon" style="done" id="l3N-Ag-loA">
                             <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>

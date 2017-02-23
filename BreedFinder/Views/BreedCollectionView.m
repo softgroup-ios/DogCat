@@ -10,61 +10,32 @@
 #import "GoogleImages.h"
 #import "BreedCell.h"
 #import "GreedoCollectionViewLayout.h"
+#import "FullScreenVC.h"
+#import "PickBreedsTableVC.h"
+
+
+
 
 typedef void (^SuccessDownloadPhoto)(UIImage* image);
 
-@interface FullScreenVC : UIViewController
-@property (strong, nonatomic) UIImage *image;
-@property (strong, nonatomic) NSString *name;
-- (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithImage: (UIImage*)image andBreedName: (NSString*)name;
-@end
-
-@implementation FullScreenVC
-- (instancetype)initWithImage: (UIImage*)image andBreedName: (NSString*)name {
-    self = [super init];
-    if (self) {
-        self.image = image;
-        self.name = name;
-        self.view = [[UIImageView alloc] initWithImage:image];
-        self.view.contentMode = UIViewContentModeScaleAspectFit;
-        self.view.backgroundColor = [UIColor blackColor];
-    }
-    return self;
-}
-
-- (void) viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelFullImage:)];
-    UIBarButtonItem* saveToGallery = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveToGallery:)];
-    self.title = self.name;
-    self.navigationItem.leftBarButtonItem = cancelButton;
-    self.navigationItem.rightBarButtonItem = saveToGallery;
-}
-
-- (void) cancelFullImage: (UIBarButtonItem*)sender {
-    [self dismissViewControllerAnimated:NO completion:nil];
-}
-
-- (void) saveToGallery: (UIBarButtonItem*) sender {
-    UIImageWriteToSavedPhotosAlbum(self.image, nil, nil, nil);
-}
-@end
 
 
 
 
-@interface BreedCollectionView () <UIPickerViewDelegate, UIPickerViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource>
 
-@property (nonatomic,strong) NSArray <NSString*>* imagesURLs;
+
+
+
+
+@interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate>
+
 @property (nonatomic,strong) NSMutableArray <UIImage*>* images;
 @property (nonatomic,strong) GoogleImages* googleImage;
 @property (nonatomic,strong) UIPickerView* pickerView;
+@property (strong, nonatomic) GreedoCollectionViewLayout *collectionViewSizeCalculator;
+@property (strong, nonatomic) UIActivityIndicatorView *spinner;
 
 @property (nonatomic, weak) IBOutlet UICollectionViewFlowLayout *flowLayout;
-
-@property (strong, nonatomic) GreedoCollectionViewLayout *collectionViewSizeCalculator;
 
 @end
 
@@ -104,13 +75,19 @@ static NSString * const reuseIdentifier = @"BreedImage";
     flowLayout.footerReferenceSize = CGSizeZero;
     flowLayout.sectionInset = UIEdgeInsetsZero;
     [self.collectionView setCollectionViewLayout:flowLayout];
+    
+    //download spinner
+    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.spinner.center = CGPointMake(self.collectionView.bounds.size.width / 2, self.collectionView.bounds.size.height / 2);
+    self.spinner.hidesWhenStopped = YES;
+    [self.view addSubview:self.spinner];
 }
 
 #pragma mark - Load All Image
 
--(void) generateAllImage
+-(void) generateAllImage: (NSArray <NSString*>*)imagesURLs
 {
-    for (NSString* imageString in self.imagesURLs)
+    for (NSString* imageString in imagesURLs)
     {
         [self downloadImage:imageString successBlock:^(UIImage *image) {
             if (image) {
@@ -235,60 +212,30 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 - (IBAction)showPopout:(UIBarButtonItem *)sender
 {
-    UIViewController* popout = [[UIViewController alloc]init];
+    PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
+    pickTVC.googleImage = self.googleImage;
+    pickTVC.delegate = self;
+    pickTVC.title = @"Pick a breed";
     
-    self.pickerView = [[UIPickerView alloc]init];
-    self.pickerView.delegate = self;
-    self.pickerView.dataSource = self;
-    self.pickerView.backgroundColor = [UIColor whiteColor];
-    popout.view = self.pickerView;
-    
-    UINavigationController* navPopuout = [[UINavigationController alloc]initWithRootViewController:popout];
-    navPopuout.modalPresentationStyle = UIModalPresentationPopover;
-    navPopuout.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
-    navPopuout.popoverPresentationController.barButtonItem = sender;
-    
-    UIBarButtonItem* barItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(donePicker:)];
-    
-    popout.navigationItem.rightBarButtonItem = barItem;
-    
-    [self presentViewController:navPopuout animated:YES completion:nil];
+    UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
--(void) donePicker: (UIBarButtonItem*) barItem
-{
-    [self dismissViewControllerAnimated:YES completion:nil];
-    NSInteger whichBreedCheck = [self.pickerView selectedRowInComponent:0];
-    NSString* string = [self.googleImage.arrayOfBreeds objectAtIndex:whichBreedCheck];
-    self.title = string;
+- (void) pickBreed: (NSString*)name {
     
-    self.imagesURLs = nil;
+    self.title = name;
     self.images = [NSMutableArray array];
     [self.collectionView reloadData];
     [self.collectionViewSizeCalculator clearCache];
-    [self.googleImage searchImages:string afterBlock:^(NSArray *arrayOfImages) {
-        self.imagesURLs = arrayOfImages;
-        [self generateAllImage];
+    
+    //start download spinner
+    [self.spinner startAnimating];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    [self.googleImage searchImages:name finishBlock:^(NSArray *arrayOfImages) {
+        [self.spinner stopAnimating];
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [self generateAllImage: arrayOfImages];
     }];
 }
-
-#pragma mark <UIPickerViewDataSource>
-
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
-{
-    return 1;
-}
-
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
-{
-    return [self.googleImage.arrayOfBreeds count];
-}
-- (nullable NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
-{
-    return [self.googleImage.arrayOfBreeds objectAtIndex:row];
-}
-
-
-
-
 @end
