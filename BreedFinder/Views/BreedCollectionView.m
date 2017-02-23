@@ -27,7 +27,7 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 
 
 
-@interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate>
+@interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
 
 @property (nonatomic,strong) NSMutableArray <UIImage*>* images;
 @property (nonatomic,strong) GoogleImages* googleImage;
@@ -36,6 +36,8 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 @property (strong, nonatomic) UIActivityIndicatorView *spinner;
 
 @property (nonatomic, weak) IBOutlet UICollectionViewFlowLayout *flowLayout;
+
+@property (weak, nonatomic) PickBreedsTableVC *pickTVC;
 
 @end
 
@@ -53,6 +55,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
 - (void) initDataAndCollectionView {
     
     self.googleImage = [[GoogleImages alloc]init];
+    self.googleImage.delegate = self;
+    
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     
@@ -81,12 +85,15 @@ static NSString * const reuseIdentifier = @"BreedImage";
     self.spinner.center = CGPointMake(self.collectionView.bounds.size.width / 2, self.collectionView.bounds.size.height / 2);
     self.spinner.hidesWhenStopped = YES;
     [self.view addSubview:self.spinner];
+    
+    self.navigationController.hidesBarsOnSwipe = YES;
 }
 
 #pragma mark - Load All Image
 
 -(void) generateAllImage: (NSArray <NSString*>*)imagesURLs
 {
+#warning bad logic
     for (NSString* imageString in imagesURLs)
     {
         [self downloadImage:imageString successBlock:^(UIImage *image) {
@@ -205,25 +212,63 @@ static NSString * const reuseIdentifier = @"BreedImage";
     FullScreenVC *imageFullScreen = [[FullScreenVC alloc]initWithImage:image andBreedName:self.title];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:imageFullScreen];
     
-    [self presentViewController:nav animated:NO completion:nil];
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
-#pragma mark - Select Breed Action
+#pragma mark - Search Action
 
-- (IBAction)showPopout:(UIBarButtonItem *)sender
+- (IBAction)showSearchView:(UIBarButtonItem *)sender
+{
+    UIAlertController *searchAlert = [UIAlertController alertControllerWithTitle:@"Search Images" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    [searchAlert addTextFieldWithConfigurationHandler:nil];
+    
+    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+        
+        NSString *text = searchAlert.textFields.firstObject.text;
+        [self searchImage:text];
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        
+    }];
+    
+    [searchAlert addAction:ok];
+    [searchAlert addAction:cancel];
+    
+    [self presentViewController:searchAlert animated:YES completion:nil];
+}
+
+- (IBAction)showDogBreeds:(UIBarButtonItem *)sender
 {
     PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
-    pickTVC.googleImage = self.googleImage;
+    pickTVC = [[PickBreedsTableVC alloc] init];
+    pickTVC.listOfBreeds = self.googleImage.dogBreeds;
+    pickTVC.typeOfBreed = Dog;
     pickTVC.delegate = self;
     pickTVC.title = @"Pick a breed";
+    self.pickTVC = pickTVC;
     
     UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (void) pickBreed: (NSString*)name {
+- (IBAction)showCatsBreeds:(UIBarButtonItem *)sender
+{
+    PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
+    pickTVC = [[PickBreedsTableVC alloc] init];
+    pickTVC.listOfBreeds = self.googleImage.catBreeds;
+    pickTVC.typeOfBreed = Cat;
+    pickTVC.delegate = self;
+    pickTVC.title = @"Pick a breed";
+    self.pickTVC = pickTVC;
     
-    self.title = name;
+    UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
+    [self presentViewController:nav animated:YES completion:nil];
+}
+
+- (void) searchImage: (NSString*)searchString {
+
+    self.title = searchString;
     self.images = [NSMutableArray array];
     [self.collectionView reloadData];
     [self.collectionViewSizeCalculator clearCache];
@@ -232,10 +277,24 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self.spinner startAnimating];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    [self.googleImage searchImages:name finishBlock:^(NSArray *arrayOfImages) {
-        [self.spinner stopAnimating];
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        [self generateAllImage: arrayOfImages];
-    }];
+    [self.googleImage searchImages:searchString];
 }
+
+
+#pragma mark - SearchImagesDelegate
+
+- (void) foundImages:(NSArray<NSString *> *)images {
+    [self.spinner stopAnimating];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [self generateAllImage: images];
+}
+
+- (void) parseReady:(NSArray<NSString *> *)breeds
+             typeOf:(NSInteger)typeOfBreed {
+    
+    if (self.pickTVC.typeOfBreed == typeOfBreed) {
+        self.pickTVC.listOfBreeds = breeds;
+    }
+}
+
 @end

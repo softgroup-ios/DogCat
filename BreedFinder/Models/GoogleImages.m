@@ -8,14 +8,15 @@
 
 #import "GoogleImages.h"
 
+
+NSString* const dogBreed = @"https://en.wikipedia.org/wiki/List_of_dog_breeds";
+NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
+
 @interface GoogleImages () <UIWebViewDelegate>
 
-
 @property (nonatomic,strong) NSArray* arrayOfCurrentImages;
-@property (nonatomic,strong,nullable) void(^finishBlock)(NSArray*);
 @property (nonatomic,strong) UIWebView* webView;
 @property (nonatomic,strong) NSString* allGooglePage;
-
 
 @end
 
@@ -23,40 +24,39 @@
 
 #pragma mark - Help methods
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self)
     {
-        self.isParse = NO;
-        dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL);
+        self.isDogParseReady = NO;
+        dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_CONCURRENT);
         dispatch_async(queue,^{
-            self.arrayOfBreeds = [self downloadAndParseWikiPage];
-            self.isParse = YES;
-            if(self.imagesReady) {
-                self.imagesReady(self.arrayOfBreeds);
-            }
-            self.allGooglePage = nil;
+            self.dogBreeds = [self downloadAndParseWikiPage:dogBreed];
+            self.isDogParseReady = YES;
+            [self.delegate parseReady:self.dogBreeds typeOf:1];
+        });
+        
+        self.isCatParseReady = NO;
+        dispatch_async(queue,^{
+            self.catBreeds = [self downloadAndParseWikiPage:catBreed];
+            self.isCatParseReady = YES;
+            [self.delegate parseReady:self.catBreeds typeOf:0];
         });
     }
     return self;
 }
 
-- (void) searchImages: (NSString*)text
-          finishBlock: (void(^)(NSArray* array))finishBlock
-{
-    self.finishBlock = finishBlock;
-    NSArray* arrayOfStrings = [text componentsSeparatedByString:@" "];
-    NSString* searchText = [arrayOfStrings componentsJoinedByString:@"+"];
-    [self loadGoogleImageFromText:searchText];
+- (void) searchImages: (NSString*)text {
+    
+    NSString *searchRequest = [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+    [self loadGoogleImageFromText:searchRequest];
 }
 
--(NSArray*) searchGoogleImagesInCurrentHTML
-{
+-(NSArray*) searchGoogleImagesInCurrentHTML {
+    
     NSMutableArray* array = [NSMutableArray array];
     NSRange nextRange = NSMakeRange(0, self.allGooglePage.length);
-    while (nextRange.location < self.allGooglePage.length)
-    {
+    while (nextRange.location < self.allGooglePage.length) {
         NSRange imageStartRange = [self.allGooglePage rangeOfString:@"\"ou\":\"" options:NSCaseInsensitiveSearch range:nextRange];
         
         if (imageStartRange.location==NSNotFound)
@@ -79,25 +79,25 @@
     return array;
 }
 
--(NSArray*) downloadAndParseWikiPage
-{
+-(NSArray*) downloadAndParseWikiPage: (NSString*)wikiPage {
+    
     NSMutableArray* array = [NSMutableArray array];
-    NSString* wikiPage = @"https://en.wikipedia.org/wiki/List_of_dog_breeds"; //List_of_cat_breeds List_of_dog_breeds
+    //NSString* wikiPage = @"https://en.wikipedia.org/wiki/List_of_dog_breeds"; //List_of_cat_breeds List_of_dog_breeds
     NSURL* wikiPageURL = [NSURL URLWithString:wikiPage];
     
     NSError* error;
     NSString* allWikiPage = [NSString stringWithContentsOfURL:wikiPageURL encoding:NSUTF8StringEncoding error:&error];
     NSRange range = [allWikiPage rangeOfString:@"<th>Breed</th>" options:NSCaseInsensitiveSearch];
     
-    if (range.location!=NSNotFound)
-    {
+    if (range.location!=NSNotFound) {
+        
         NSRange lastRange = NSMakeRange(range.location + range.length, allWikiPage.length - (range.location + range.length) - 1);
         NSRange allTableRange = [allWikiPage rangeOfString:@"</table>" options:NSCaseInsensitiveSearch range:lastRange];
-        if (allTableRange.location!=NSNotFound)
-        {
+        if (allTableRange.location!=NSNotFound){
+            
             long long startFrom = lastRange.location;
-            while (startFrom < allTableRange.location)
-            {
+            while (startFrom < allTableRange.location) {
+                
                 NSRange searchRange = NSMakeRange(startFrom, allWikiPage.length - startFrom - 1);
                 NSRange trRange = [allWikiPage rangeOfString:@"<tr>" options:NSCaseInsensitiveSearch range:searchRange];
                 if ((trRange.location==NSNotFound)||(trRange.location > allTableRange.location))
@@ -123,8 +123,8 @@
     return array;
 }
 
-- (void) loadGoogleImageFromText: (NSString*) text
-{
+- (void) loadGoogleImageFromText: (NSString*) text {
+    
     NSString* googlePage = [NSString stringWithFormat:@"https://www.google.com.ua/search?tbm=isch&q=%@",text];
     NSURL* googlePageURL = [NSURL URLWithString:googlePage];
     
@@ -134,25 +134,21 @@
     [self.webView loadRequest:googleImageRequest];
 }
 
-- (void) getHTMLFromSite
-{
+- (void) getHTMLFromSite {
+    
     NSString* javaScriptCode = @"document.getElementsByTagName('html')[0].innerHTML";
     
     self.allGooglePage = [self.webView stringByEvaluatingJavaScriptFromString:javaScriptCode];
     
     NSArray *array = [self searchGoogleImagesInCurrentHTML];
-    self.finishBlock(array);
+    [self.delegate foundImages:array];
 }
 
 
 #pragma mark - UIWebViewDelegate
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self getHTMLFromSite];
 }
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
-{
-    
-}
+
 @end

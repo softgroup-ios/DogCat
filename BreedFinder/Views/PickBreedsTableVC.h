@@ -10,16 +10,20 @@
 
 
 @protocol SuccessPickBreedDelegate <NSObject>
-- (void) pickBreed: (NSString*)name;
+- (void) searchImage: (NSString*)name;
 @end
 
-
+typedef enum : NSUInteger {
+    Cat,
+    Dog
+} TypeOfBreed;
 
 @class GoogleImages;
 
-@interface PickBreedsTableVC : UITableViewController <UITableViewDelegate,UITableViewDataSource>
+@interface PickBreedsTableVC : UITableViewController
 
-@property (strong, nonatomic) GoogleImages *googleImage;
+@property (strong, nonatomic) NSArray <NSString*> *listOfBreeds;
+@property (assign, nonatomic) TypeOfBreed typeOfBreed;
 @property (weak, nonatomic) id <SuccessPickBreedDelegate> delegate;
 
 @end

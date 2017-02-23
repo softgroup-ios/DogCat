@@ -7,6 +7,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -55,12 +56,26 @@
                         </connections>
                     </collectionView>
                     <navigationItem key="navigationItem" id="oUw-za-gfp">
-                        <barButtonItem key="leftBarButtonItem" image="dog-icon" style="done" id="l3N-Ag-loA">
+                        <barButtonItem key="leftBarButtonItem" image="search-loop" id="DJN-uS-gYo">
                             <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <action selector="showPopout:" destination="8Zh-KW-7Bt" id="yDd-mA-d0t"/>
+                                <action selector="showSearchView:" destination="8Zh-KW-7Bt" id="lbj-uV-gE8"/>
                             </connections>
                         </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem image="dog-icon" style="done" id="l3N-Ag-loA">
+                                <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <action selector="showDogBreeds:" destination="8Zh-KW-7Bt" id="OFU-hd-vTX"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="dog-icon" style="done" id="gkF-oF-SXg">
+                                <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <action selector="showCatsBreeds:" destination="8Zh-KW-7Bt" id="ITY-cg-UJ0"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="flowLayout" destination="1ig-3w-k2d" id="Nl9-0P-7in"/>
@@ -89,5 +104,6 @@
     </scenes>
     <resources>
         <image name="dog-icon" width="44" height="44"/>
+        <image name="search-loop" width="44" height="44"/>
     </resources>
 </document>
