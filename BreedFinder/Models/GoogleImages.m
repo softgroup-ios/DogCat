@@ -142,6 +142,7 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
     
     NSArray *array = [self searchGoogleImagesInCurrentHTML];
     [self.delegate foundImages:array];
+    
 }
 
 

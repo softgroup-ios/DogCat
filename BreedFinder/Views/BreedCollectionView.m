@@ -93,23 +93,17 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 -(void) generateAllImage: (NSArray <NSString*>*)imagesURLs
 {
-#warning bad logic
     for (NSString* imageString in imagesURLs)
     {
         [self downloadImage:imageString successBlock:^(UIImage *image) {
             if (image) {
                 @synchronized (self.images) {
                     [self.images addObject:image];
-                    if (self.images.count % 2 == 0) {
-                        [self.collectionView reloadData];
-                    }
+                    [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.images.count-1 inSection:0]]];
                 }
             }
         }];
     }
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.collectionView reloadData];
-    });
 }
 
 #pragma mark  Download Image
@@ -124,6 +118,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
         if (!data||error) {
+            NSLog(@"error: %@", error.localizedDescription);
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 successBlock(nil);
             });
@@ -167,10 +163,20 @@ static NSString * const reuseIdentifier = @"BreedImage";
     BreedCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
     UIImage* image = [self.images objectAtIndex:indexPath.row];
-    cell.imageView.image = image;
+    
+    cell.imageView.image = [self imageWithImage:image scaledToSize:CGSizeMake(image.size.width/3.f, image.size.height/3.f)];
     cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
     
     return cell;
+}
+
+- (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize
+{
+    UIGraphicsBeginImageContext(newSize);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
 }
 
 #pragma mark - UICollectionViewDelegate
