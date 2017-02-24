@@ -27,9 +27,10 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 
 
 
-@interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
+@interface BreedCollectionView () <UINavigationControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
 
 @property (nonatomic,strong) NSMutableArray <UIImage*>* images;
+//@property (nonatomic,strong) NSMutableArray <UIImage*>* images;
 @property (nonatomic,strong) GoogleImages* googleImage;
 @property (nonatomic,strong) UIPickerView* pickerView;
 @property (strong, nonatomic) GreedoCollectionViewLayout *collectionViewSizeCalculator;
@@ -87,6 +88,23 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self.view addSubview:self.spinner];
     
     self.navigationController.hidesBarsOnSwipe = YES;
+    self.navigationController.delegate = self;
+}
+
+- (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
+{
+    return [self supportedInterfaceOrientations];
+}
+
+- (UIInterfaceOrientationMask) supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size
+       withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
+    if (size.height < size.width) {
+        
+    }
 }
 
 #pragma mark - Load All Image
@@ -112,14 +130,11 @@ static NSString * const reuseIdentifier = @"BreedImage";
           successBlock: (SuccessDownloadPhoto) successBlock {
     
     NSURL *url = [NSURL URLWithString:urlString];
-    
     NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
         if (!data||error) {
-            NSLog(@"error: %@", error.localizedDescription);
-            
             dispatch_async(dispatch_get_main_queue(), ^{
                 successBlock(nil);
             });
@@ -161,17 +176,30 @@ static NSString * const reuseIdentifier = @"BreedImage";
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
     BreedCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
+    CGSize imageSize = [self collectionView:collectionView layout:collectionView.collectionViewLayout sizeForItemAtIndexPath:indexPath];
     
     UIImage* image = [self.images objectAtIndex:indexPath.row];
-    
-    cell.imageView.image = [self imageWithImage:image scaledToSize:CGSizeMake(image.size.width/3.f, image.size.height/3.f)];
+    cell.imageView.image = [self imageWithImage:image scaledToSize:imageSize];
     cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
     
     return cell;
 }
 
-- (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize
-{
+- (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)toSize {
+    
+    CGFloat imageScale = image.size.height/image.size.width;
+    CGFloat toSizeScale = toSize.height/toSize.width;
+    
+    CGSize newSize = toSize;
+    if (imageScale != toSizeScale) {
+        if (toSize.height > toSize.width) {
+            newSize = CGSizeMake(toSize.height / imageScale, toSize.height);
+        }
+        else {
+            newSize = CGSizeMake(toSize.width, toSize.width * imageScale);
+        }
+    }
+    
     UIGraphicsBeginImageContext(newSize);
     [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
