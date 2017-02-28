@@ -27,7 +27,7 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 
 
 
-@interface BreedCollectionView () <UINavigationControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
+@interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
 
 @property (nonatomic,strong) NSMutableArray <UIImage*>* images;
 //@property (nonatomic,strong) NSMutableArray <UIImage*>* images;
@@ -88,22 +88,17 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self.view addSubview:self.spinner];
     
     self.navigationController.hidesBarsOnSwipe = YES;
-    self.navigationController.delegate = self;
 }
 
-- (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
-{
-    return [self supportedInterfaceOrientations];
-}
 
-- (UIInterfaceOrientationMask) supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
-}
 
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
-    if (size.height < size.width) {
-        
+    if (self.view.frame.size.width != size.width) {
+        [self.collectionViewSizeCalculator clearCache];
+        @synchronized (self) {
+            [self.collectionView reloadData];
+        }
     }
 }
 
@@ -115,7 +110,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     {
         [self downloadImage:imageString successBlock:^(UIImage *image) {
             if (image) {
-                @synchronized (self.images) {
+                @synchronized (self) {
                     [self.images addObject:image];
                     [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.images.count-1 inSection:0]]];
                 }
@@ -161,8 +156,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
         UIImage *image = [self.images objectAtIndex:indexPath.item];
         return image.size;
     }
-    
-    NSLog(@"indexPath: %ld %ld",indexPath.item,self.images.count);
     
     return CGSizeMake(0.1, 0.1);
 }
@@ -243,7 +236,13 @@ static NSString * const reuseIdentifier = @"BreedImage";
 #pragma mark - Open Image
 
 - (void) openImageFullScreen: (UIImage*) image {
-    FullScreenVC *imageFullScreen = [[FullScreenVC alloc]initWithImage:image andBreedName:self.title];
+    
+    UIStoryboard *defaultStorybord = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    FullScreenVC *imageFullScreen = [defaultStorybord instantiateViewControllerWithIdentifier:@"FullScreenVC"];
+    imageFullScreen.image = image;
+    imageFullScreen.name = self.title;
+    
+    //FullScreenVC *imageFullScreen = [[FullScreenVC alloc]initWithImage:image andBreedName:self.title];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:imageFullScreen];
     
     [self presentViewController:nav animated:YES completion:nil];

@@ -14,6 +14,7 @@
 
 @property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) NSString *name;
+
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithImage: (UIImage*)image andBreedName: (NSString*)name;
 

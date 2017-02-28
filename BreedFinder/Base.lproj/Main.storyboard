@@ -84,6 +84,38 @@
             </objects>
             <point key="canvasLocation" x="360.80000000000001" y="-297.30134932533736"/>
         </scene>
+        <!--Full ScreenVC-->
+        <scene sceneID="hSK-gD-GLG">
+            <objects>
+                <viewController storyboardIdentifier="FullScreenVC" id="6mh-Om-dCr" customClass="FullScreenVC" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Igt-i8-1T5"/>
+                        <viewControllerLayoutGuide type="bottom" id="Mhm-vf-Car"/>
+                    </layoutGuides>
+                    <scrollView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" id="uzd-v9-JAK">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zrg-Ec-ueY">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="width" secondItem="uzd-v9-JAK" secondAttribute="width" id="EvO-DV-JaG"/>
+                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="centerY" secondItem="uzd-v9-JAK" secondAttribute="centerY" id="fEn-03-R9H"/>
+                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="centerX" secondItem="uzd-v9-JAK" secondAttribute="centerX" id="gKd-Gx-2Yl"/>
+                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="height" secondItem="uzd-v9-JAK" secondAttribute="height" id="kjv-Y7-5TY"/>
+                        </constraints>
+                    </scrollView>
+                    <connections>
+                        <outlet property="imageView" destination="zrg-Ec-ueY" id="E8t-xU-agP"/>
+                        <outlet property="scrollView" destination="uzd-v9-JAK" id="0Gv-T6-3EM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Pf6-9A-KYi" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1160.8" y="-297.30134932533736"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="sot-WV-LeP">
             <objects>
