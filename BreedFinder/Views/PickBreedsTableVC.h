@@ -7,16 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GoogleImages.h"
+
+
 
 
 @protocol SuccessPickBreedDelegate <NSObject>
 - (void) searchImage: (NSString*)name;
 @end
 
-typedef enum : NSUInteger {
-    Cat,
-    Dog
-} TypeOfBreed;
+
 
 @class GoogleImages;
 

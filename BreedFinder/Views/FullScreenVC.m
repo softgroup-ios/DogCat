@@ -32,18 +32,13 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelFullImage:)];
-    UIBarButtonItem* saveToGallery = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveToGallery:)];
     self.title = self.name;
-    self.navigationItem.leftBarButtonItem = cancelButton;
-    self.navigationItem.rightBarButtonItem = saveToGallery;
-
 }
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.navigationController.hidesBarsOnTap = YES;
+    [self.navigationController.barHideOnTapGestureRecognizer addTarget:self action:@selector(tapAction:)];
     
     UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeDown:)];
     swipe.direction = UISwipeGestureRecognizerDirectionDown;
@@ -51,25 +46,26 @@
     
     self.imageView.image = self.image;
     self.scrollView.delegate = self;
-    [self updateZoom];
+    [self updateZoomAnimate:NO];
+    [self updateConstraintsWithAnimate:NO];
 }
 
 #pragma mark - Zoom Image
 
-- (void) updateZoom {
+- (void) updateZoomAnimate: (BOOL)animate {
     if (self.image) {
         CGFloat minZoom = MIN(self.scrollView.bounds.size.width / self.image.size.width, self.scrollView.bounds.size.height / self.image.size.height);
-        if (minZoom > 1) { minZoom = 1; }
+        //if (minZoom > 1) { minZoom = 1; }
         self.scrollView.minimumZoomScale = 1 * minZoom;
         
         if (minZoom == self.lastZoomScale) { minZoom += 0.000001;}
         
-        self.scrollView.zoomScale = minZoom;
+        [self.scrollView setZoomScale:minZoom animated:animate];
         self.lastZoomScale = minZoom;
     }
 }
 
-- (void) updateConstraints {
+- (void) updateConstraintsWithAnimate: (BOOL)animate {
     
     if (self.image) {
         CGFloat imageWidth = self.image.size.width;
@@ -89,7 +85,13 @@
         self.imageConstraintTop.constant = vPadding;
         self.imageConstraintBottom.constant = vPadding;
         
-        [self.view layoutIfNeeded];
+        if (animate) {
+            [UIView animateWithDuration:0.25 animations:^{
+                [self.view layoutIfNeeded];
+            }];
+        } else {
+            [self.view layoutIfNeeded];
+        }
     }
 }
 
@@ -99,7 +101,7 @@
        withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
     
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-        [self updateZoom];
+        [self updateZoomAnimate:YES];
     } completion:nil];
 }
 
@@ -110,21 +112,26 @@
 }
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView NS_AVAILABLE_IOS(3_2) {
-    [self updateConstraints];
+    [self updateConstraintsWithAnimate:NO];
 }
 
 
 #pragma mark - Actions
 
+- (void) tapAction: (UITapGestureRecognizer*)sender {
+        [self updateZoomAnimate:NO];
+        //[self updateConstraintsWithAnimate:YES];
+}
+
 - (void) swipeDown: (UITapGestureRecognizer*)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void) cancelFullImage: (UIBarButtonItem*)sender {
+- (IBAction) cancelFullImage: (UIBarButtonItem*)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void) saveToGallery: (UIBarButtonItem*)sender {
+- (IBAction) saveToGallery: (UIBarButtonItem*)sender {
     UIImageWriteToSavedPhotosAlbum(self.image, self, @selector(image:savedWithError:contextInfo:), nil);
 }
 

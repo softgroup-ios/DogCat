@@ -9,8 +9,7 @@
 #import "GoogleImages.h"
 
 
-NSString* const dogBreed = @"https://en.wikipedia.org/wiki/List_of_dog_breeds";
-NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
+
 
 @interface GoogleImages () <UIWebViewDelegate>
 
@@ -21,6 +20,9 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
 @end
 
 @implementation GoogleImages
+
+NSString* const dogBreed = @"https://en.wikipedia.org/wiki/List_of_dog_breeds";
+NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
 
 #pragma mark - Help methods
 
@@ -33,14 +35,14 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
         dispatch_async(queue,^{
             self.dogBreeds = [self downloadAndParseWikiPage:dogBreed];
             self.isDogParseReady = YES;
-            [self.delegate parseReady:self.dogBreeds typeOf:1];
+            [self.delegate parseReady:self.dogBreeds typeOf:Dog];
         });
         
         self.isCatParseReady = NO;
         dispatch_async(queue,^{
             self.catBreeds = [self downloadAndParseWikiPage:catBreed];
             self.isCatParseReady = YES;
-            [self.delegate parseReady:self.catBreeds typeOf:0];
+            [self.delegate parseReady:self.catBreeds typeOf:Cat];
         });
     }
     return self;
@@ -95,7 +97,7 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
         NSRange allTableRange = [allWikiPage rangeOfString:@"</table>" options:NSCaseInsensitiveSearch range:lastRange];
         if (allTableRange.location!=NSNotFound){
             
-            long long startFrom = lastRange.location;
+            NSInteger startFrom = lastRange.location;
             while (startFrom < allTableRange.location) {
                 
                 NSRange searchRange = NSMakeRange(startFrom, allWikiPage.length - startFrom - 1);
@@ -142,7 +144,6 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
     
     NSArray *array = [self searchGoogleImagesInCurrentHTML];
     [self.delegate foundImages:array];
-    
 }
 
 

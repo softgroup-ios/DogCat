@@ -45,6 +45,13 @@ NSString* const cellIdentifier = @"pick_breed";
     }
 }
 
+- (void)viewWillTransitionToSize:(CGSize)size
+       withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
+    if (self.view.frame.size.width != size.width) {
+        self.spinner.center = CGPointMake(size.width / 2, size.height / 2);
+    }
+}
+
 - (void) setListOfBreeds:(NSArray<NSString *> *)listOfBreeds {
     _listOfBreeds = listOfBreeds;
     [self.spinner stopAnimating];

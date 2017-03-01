@@ -9,12 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+typedef enum : NSUInteger {
+    Cat,
+    Dog
+} TypeOfBreed;
 
 
 @protocol SearchImagesDelegate <NSObject>
 - (void) foundImages: (NSArray <NSString*>*)images;
 - (void) parseReady: (NSArray <NSString*>*)breeds
-             typeOf: (NSInteger) typeOfBreed;
+             typeOf: (TypeOfBreed) typeOfBreed;
 @end
 
 

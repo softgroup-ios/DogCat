@@ -30,7 +30,6 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 @interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
 
 @property (nonatomic,strong) NSMutableArray <UIImage*>* images;
-//@property (nonatomic,strong) NSMutableArray <UIImage*>* images;
 @property (nonatomic,strong) GoogleImages* googleImage;
 @property (nonatomic,strong) UIPickerView* pickerView;
 @property (strong, nonatomic) GreedoCollectionViewLayout *collectionViewSizeCalculator;
@@ -39,6 +38,7 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 @property (nonatomic, weak) IBOutlet UICollectionViewFlowLayout *flowLayout;
 
 @property (weak, nonatomic) PickBreedsTableVC *pickTVC;
+@property (assign, nonatomic) BOOL insertProcess;
 
 @end
 
@@ -95,9 +95,10 @@ static NSString * const reuseIdentifier = @"BreedImage";
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
     if (self.view.frame.size.width != size.width) {
+        self.spinner.center = CGPointMake(size.width / 2, size.height / 2);
         [self.collectionViewSizeCalculator clearCache];
-        @synchronized (self) {
-            [self.collectionView reloadData];
+        if (!self.insertProcess) {
+            [self.collectionView setCollectionViewLayout:self.flowLayout animated:YES];
         }
     }
 }
@@ -111,8 +112,10 @@ static NSString * const reuseIdentifier = @"BreedImage";
         [self downloadImage:imageString successBlock:^(UIImage *image) {
             if (image) {
                 @synchronized (self) {
+                    self.insertProcess = YES;
                     [self.images addObject:image];
                     [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.images.count-1 inSection:0]]];
+                    self.insertProcess = NO;
                 }
             }
         }];
@@ -238,13 +241,11 @@ static NSString * const reuseIdentifier = @"BreedImage";
 - (void) openImageFullScreen: (UIImage*) image {
     
     UIStoryboard *defaultStorybord = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    FullScreenVC *imageFullScreen = [defaultStorybord instantiateViewControllerWithIdentifier:@"FullScreenVC"];
+    UINavigationController *nav = [defaultStorybord instantiateViewControllerWithIdentifier:@"FullScreenVC"];
+    FullScreenVC *imageFullScreen = nav.viewControllers.firstObject;
     imageFullScreen.image = image;
     imageFullScreen.name = self.title;
-    
-    //FullScreenVC *imageFullScreen = [[FullScreenVC alloc]initWithImage:image andBreedName:self.title];
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:imageFullScreen];
-    
+
     [self presentViewController:nav animated:YES completion:nil];
 }
 
@@ -320,7 +321,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
 }
 
 - (void) parseReady:(NSArray<NSString *> *)breeds
-             typeOf:(NSInteger)typeOfBreed {
+             typeOf:(TypeOfBreed)typeOfBreed {
     
     if (self.pickTVC.typeOfBreed == typeOfBreed) {
         self.pickTVC.listOfBreeds = breeds;
