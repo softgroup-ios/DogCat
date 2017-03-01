@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="oqh-Xc-tPf">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="oqh-Xc-tPf">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -84,38 +84,6 @@
             </objects>
             <point key="canvasLocation" x="360.80000000000001" y="-297.30134932533736"/>
         </scene>
-        <!--Full ScreenVC-->
-        <scene sceneID="hSK-gD-GLG">
-            <objects>
-                <viewController storyboardIdentifier="FullScreenVC" id="6mh-Om-dCr" customClass="FullScreenVC" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="Igt-i8-1T5"/>
-                        <viewControllerLayoutGuide type="bottom" id="Mhm-vf-Car"/>
-                    </layoutGuides>
-                    <scrollView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" id="uzd-v9-JAK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zrg-Ec-ueY">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                            </imageView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="width" secondItem="uzd-v9-JAK" secondAttribute="width" id="EvO-DV-JaG"/>
-                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="centerY" secondItem="uzd-v9-JAK" secondAttribute="centerY" id="fEn-03-R9H"/>
-                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="centerX" secondItem="uzd-v9-JAK" secondAttribute="centerX" id="gKd-Gx-2Yl"/>
-                            <constraint firstItem="zrg-Ec-ueY" firstAttribute="height" secondItem="uzd-v9-JAK" secondAttribute="height" id="kjv-Y7-5TY"/>
-                        </constraints>
-                    </scrollView>
-                    <connections>
-                        <outlet property="imageView" destination="zrg-Ec-ueY" id="E8t-xU-agP"/>
-                        <outlet property="scrollView" destination="uzd-v9-JAK" id="0Gv-T6-3EM"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Pf6-9A-KYi" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1160.8" y="-297.30134932533736"/>
-        </scene>
         <!--Navigation Controller-->
         <scene sceneID="sot-WV-LeP">
             <objects>
@@ -131,6 +99,74 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nOg-mQ-TOZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-542" y="-297"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="2Zt-ID-OqV">
+            <objects>
+                <navigationController id="A5w-m8-kVN" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Hqv-Sa-crU">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="3X4-UM-1Gs" kind="relationship" relationship="rootViewController" id="Txj-lI-Brr"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Tpm-iP-LV0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1468" y="-374"/>
+        </scene>
+        <!--Name of breed-->
+        <scene sceneID="8bt-fT-BC5">
+            <objects>
+                <viewController storyboardIdentifier="FullScreenVC" id="3X4-UM-1Gs" customClass="FullScreenVC" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Q0i-sB-cuQ"/>
+                        <viewControllerLayoutGuide type="bottom" id="32M-Sw-INN"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="ZP7-Lk-9Hn">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" maximumZoomScale="3" translatesAutoresizingMaskIntoConstraints="NO" id="4q6-W5-2Xh">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="100" placeholderIntrinsicHeight="100" translatesAutoresizingMaskIntoConstraints="NO" id="onq-Jy-MjK">
+                                        <rect key="frame" x="150" y="250" width="100" height="100"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="onq-Jy-MjK" firstAttribute="top" secondItem="4q6-W5-2Xh" secondAttribute="top" constant="250" id="9V9-8f-MYI"/>
+                                    <constraint firstItem="onq-Jy-MjK" firstAttribute="leading" secondItem="4q6-W5-2Xh" secondAttribute="leading" constant="150" id="BNr-QL-3gM"/>
+                                    <constraint firstItem="onq-Jy-MjK" firstAttribute="trailing" secondItem="4q6-W5-2Xh" secondAttribute="trailing" constant="-1" id="gmD-Xr-gMY" userLabel="Horizontal Space - (-1) - Scroll View - Image View"/>
+                                    <constraint firstItem="onq-Jy-MjK" firstAttribute="bottom" secondItem="4q6-W5-2Xh" secondAttribute="bottom" constant="-1" id="y6r-B4-5u4"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="4q6-W5-2Xh" secondAttribute="trailing" id="ARs-mu-HQU"/>
+                            <constraint firstItem="4q6-W5-2Xh" firstAttribute="top" secondItem="Q0i-sB-cuQ" secondAttribute="bottom" id="Lu4-JU-EU1"/>
+                            <constraint firstItem="32M-Sw-INN" firstAttribute="top" secondItem="4q6-W5-2Xh" secondAttribute="bottom" id="WCw-8W-cb0"/>
+                            <constraint firstItem="4q6-W5-2Xh" firstAttribute="leading" secondItem="ZP7-Lk-9Hn" secondAttribute="leading" id="X6q-gn-4w4"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Name of breed" id="OYF-Yx-dkf">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="IJY-Y6-BIK"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="WPi-xX-j2D"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="imageConstraintBottom" destination="y6r-B4-5u4" id="3m4-73-USp"/>
+                        <outlet property="imageConstraintLeft" destination="BNr-QL-3gM" id="vy5-OK-pU8"/>
+                        <outlet property="imageConstraintRight" destination="gmD-Xr-gMY" id="MYV-QC-Ra5"/>
+                        <outlet property="imageConstraintTop" destination="9V9-8f-MYI" id="PJc-Ep-Khr"/>
+                        <outlet property="imageView" destination="onq-Jy-MjK" id="cb3-tr-SNm"/>
+                        <outlet property="scrollView" destination="4q6-W5-2Xh" id="5GN-li-gef"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="J69-9o-Smw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2276" y="-373.76311844077964"/>
         </scene>
     </scenes>
     <resources>

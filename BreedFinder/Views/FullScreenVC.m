@@ -11,54 +11,23 @@
 @interface FullScreenVC () <UIScrollViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (weak, nonatomic)   IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintTop;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintRight;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintLeft;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintBottom;
+
+@property (assign, nonatomic) CGFloat lastZoomScale;
 
 @end
 
 @implementation FullScreenVC
 
-- (instancetype)initWithImage: (UIImage*)image andBreedName: (NSString*)name {
-    self = [super init];
-    if (self) {
-        self.image = image;
-        self.name = name;
-        
-        self.scrollView = [[UIScrollView alloc] init];
-        self.scrollView.frame = self.view.frame;
-        self.scrollView.userInteractionEnabled = YES;
-        self.scrollView.minimumZoomScale = 1.0f;
-        self.scrollView.maximumZoomScale = 3.0f;
-        self.scrollView.scrollEnabled = NO;
-        self.scrollView.delegate = self;
-        self.scrollView.backgroundColor = [UIColor blackColor];
-        
-        self.scrollView.clipsToBounds = NO;
-        self.scrollView.contentInset = UIEdgeInsetsZero;
-        self.scrollView.pagingEnabled = YES;
-        
-        self.imageView = [[UIImageView alloc] initWithImage:image];
-        self.imageView.frame = self.scrollView.frame;
-        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.imageView.backgroundColor = [UIColor blackColor];
-        [self.scrollView addSubview:self.imageView];
-        
-        self.view = self.scrollView;
-    }
-    return self;
-}
 
 - (void) viewDidLoad {
-    
-    self.scrollView.minimumZoomScale = 1.0f;
-    self.scrollView.maximumZoomScale = 3.0f;
-    self.scrollView.scrollEnabled = NO;
-    self.scrollView.delegate = self;
-    self.scrollView.backgroundColor = [UIColor blackColor];
-    
-    self.imageView.image = self.image;
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.imageView.backgroundColor = [UIColor blackColor];
-
+    [super viewDidLoad];
+    self.lastZoomScale = -1;
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -69,6 +38,7 @@
     self.title = self.name;
     self.navigationItem.leftBarButtonItem = cancelButton;
     self.navigationItem.rightBarButtonItem = saveToGallery;
+
 }
 
 - (void) viewDidAppear:(BOOL)animated {
@@ -78,17 +48,59 @@
     UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeDown:)];
     swipe.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:swipe];
+    
+    self.imageView.image = self.image;
+    self.scrollView.delegate = self;
+    [self updateZoom];
+}
+
+#pragma mark - Zoom Image
+
+- (void) updateZoom {
+    if (self.image) {
+        CGFloat minZoom = MIN(self.scrollView.bounds.size.width / self.image.size.width, self.scrollView.bounds.size.height / self.image.size.height);
+        if (minZoom > 1) { minZoom = 1; }
+        self.scrollView.minimumZoomScale = 1 * minZoom;
+        
+        if (minZoom == self.lastZoomScale) { minZoom += 0.000001;}
+        
+        self.scrollView.zoomScale = minZoom;
+        self.lastZoomScale = minZoom;
+    }
+}
+
+- (void) updateConstraints {
+    
+    if (self.image) {
+        CGFloat imageWidth = self.image.size.width;
+        CGFloat imageHeight = self.image.size.height;
+        CGFloat viewWidth = self.scrollView.bounds.size.width;
+        CGFloat viewHeight = self.scrollView.bounds.size.height;
+        
+        CGFloat hPadding = (viewWidth - self.scrollView.zoomScale * imageWidth) / 2;
+        if (hPadding < 0) { hPadding = 0;}
+        
+        CGFloat vPadding = (viewHeight - self.scrollView.zoomScale * imageHeight) / 2;
+        if (vPadding < 0) { vPadding = 0;}
+        
+        self.imageConstraintLeft.constant = hPadding;
+        self.imageConstraintRight.constant = hPadding;
+        
+        self.imageConstraintTop.constant = vPadding;
+        self.imageConstraintBottom.constant = vPadding;
+        
+        [self.view layoutIfNeeded];
+    }
 }
 
 #pragma mark - Landscape mode
 
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
-    if (self.view.frame.size.width != size.width) {
-        //self.scrollView.frame = CGRectMake(0, 0, size.width, size.height);
-        self.imageView.frame = CGRectMake(0, 0, size.width, size.height);
-        self.scrollView.zoomScale = 1.f;
-    }
+    
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        [self updateZoom];
+    } completion:nil];
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -97,62 +109,10 @@
     return self.imageView;
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    
-}// any offset changes
-
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView NS_AVAILABLE_IOS(3_2) {
-    
-}// any zoom scale changes
-
-// called on start of dragging (may require some time and or distance to move)
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    
-}
-// called on finger up if the user dragged. velocity is in points/millisecond. targetContentOffset may be changed to adjust where the scroll view comes to rest
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset NS_AVAILABLE_IOS(5_0) {
-    
-}
-// called on finger up if the user dragged. decelerate is true if it will continue moving afterwards
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    
+    [self updateConstraints];
 }
 
-- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    
-}// called on finger up as we are moving
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    
-}// called when scroll view grinds to a halt
-
-- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
-    
-}
-// called when setContentOffset/scrollRectVisible:animated: finishes. not called if not animating
-
-- (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(nullable UIView *)view NS_AVAILABLE_IOS(3_2) {
-    
-}// called before the scroll view begins zooming its content
-
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(nullable UIView *)view atScale:(CGFloat)scale {
-    
-    if (scale != 1.0) {
-        scrollView.scrollEnabled = YES;
-        
-    }
-    else {
-        scrollView.scrollEnabled = NO;
-    }
-}// scale between minimum and maximum. called after any 'bounce' animations
-
-- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView {
-    return  NO;
-}// return a yes if you want to scroll to the top. if not defined, assumes YES
-
-- (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView {
-    
-}
 
 #pragma mark - Actions
 

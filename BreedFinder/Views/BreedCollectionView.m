@@ -250,8 +250,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 #pragma mark - Search Action
 
-- (IBAction)showSearchView:(UIBarButtonItem *)sender
-{
+- (IBAction)showSearchView:(UIBarButtonItem *)sender {
     UIAlertController *searchAlert = [UIAlertController alertControllerWithTitle:@"Search Images" message:nil preferredStyle:UIAlertControllerStyleAlert];
     [searchAlert addTextFieldWithConfigurationHandler:nil];
     
@@ -271,8 +270,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self presentViewController:searchAlert animated:YES completion:nil];
 }
 
-- (IBAction)showDogBreeds:(UIBarButtonItem *)sender
-{
+- (IBAction)showDogBreeds:(UIBarButtonItem *)sender {
     PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
     pickTVC = [[PickBreedsTableVC alloc] init];
     pickTVC.listOfBreeds = self.googleImage.dogBreeds;
@@ -285,8 +283,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (IBAction)showCatsBreeds:(UIBarButtonItem *)sender
-{
+- (IBAction)showCatsBreeds:(UIBarButtonItem *)sender {
     PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
     pickTVC = [[PickBreedsTableVC alloc] init];
     pickTVC.listOfBreeds = self.googleImage.catBreeds;
