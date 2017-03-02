@@ -32,7 +32,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.title = self.name;
+    [self setupTitle:self.name];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
@@ -48,6 +48,19 @@
     self.scrollView.delegate = self;
     [self updateZoomAnimate:NO];
     [self updateConstraintsWithAnimate:NO];
+}
+
+- (void) setupTitle: (NSString*)text {
+    
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, 40)];
+    titleLabel.text = text;
+    titleLabel.backgroundColor = [UIColor clearColor];
+    titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    titleLabel.numberOfLines = 0;
+    titleLabel.adjustsFontSizeToFitWidth = YES; // As alternative you can also make it multi-line.
+    titleLabel.minimumScaleFactor = 0.5;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.navigationItem.titleView = titleLabel;
 }
 
 #pragma mark - Zoom Image
@@ -119,8 +132,10 @@
 #pragma mark - Actions
 
 - (void) tapAction: (UITapGestureRecognizer*)sender {
-        [self updateZoomAnimate:NO];
-        //[self updateConstraintsWithAnimate:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self updateZoomAnimate:YES];
+        [self updateConstraintsWithAnimate:YES];
+    });
 }
 
 - (void) swipeDown: (UITapGestureRecognizer*)sender {

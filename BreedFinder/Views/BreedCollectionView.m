@@ -27,18 +27,22 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 
 
 
-@interface BreedCollectionView () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
+@interface BreedCollectionView () <UINavigationControllerDelegate ,UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
 
 @property (nonatomic,strong) NSMutableArray <UIImage*>* images;
+@property (nonatomic,strong) NSMutableArray <NSURLSessionDataTask*>* downloadTasks;
+@property (nonatomic,strong) NSString* searchName;
 @property (nonatomic,strong) GoogleImages* googleImage;
-@property (nonatomic,strong) UIPickerView* pickerView;
 @property (strong, nonatomic) GreedoCollectionViewLayout *collectionViewSizeCalculator;
-@property (strong, nonatomic) UIActivityIndicatorView *spinner;
 
 @property (nonatomic, weak) IBOutlet UICollectionViewFlowLayout *flowLayout;
 
 @property (weak, nonatomic) PickBreedsTableVC *pickTVC;
-@property (assign, nonatomic) BOOL insertProcess;
+@property (strong, nonatomic) UIActivityIndicatorView *spinner;
+@property (assign, nonatomic) NSInteger countOfObject;
+@property (assign, nonatomic) BOOL hideStatusBar;
+@property (assign, nonatomic) BOOL firstItem;
+@property (assign, nonatomic) BOOL endReload;
 
 @end
 
@@ -60,6 +64,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
     
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
+    
+    self.navigationController.delegate = self;
     
     self.collectionView.backgroundColor = [UIColor whiteColor];
     self.clearsSelectionOnViewWillAppear = YES;
@@ -87,23 +93,70 @@ static NSString * const reuseIdentifier = @"BreedImage";
     self.spinner.hidesWhenStopped = YES;
     [self.view addSubview:self.spinner];
     
-    self.navigationController.hidesBarsOnSwipe = YES;
+    self.navigationController.hidesBarsOnSwipe = NO;
+    [self.navigationController.barHideOnSwipeGestureRecognizer addTarget:self action:@selector(swipe:)];
 }
 
+- (void) setupTitle: (NSString*)text {
+    
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, 40)];
+    titleLabel.text = text;
+    titleLabel.backgroundColor = [UIColor clearColor];
+    titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    titleLabel.numberOfLines = 0;
+    titleLabel.adjustsFontSizeToFitWidth = YES; // As alternative you can also make it multi-line.
+    titleLabel.minimumScaleFactor = 0.5;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.navigationItem.titleView = titleLabel;
+}
 
+#pragma mark - Go to Landscape
 
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
+    
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     if (self.view.frame.size.width != size.width) {
         self.spinner.center = CGPointMake(size.width / 2, size.height / 2);
         [self.collectionViewSizeCalculator clearCache];
-        if (!self.insertProcess) {
-            [self.collectionView setCollectionViewLayout:self.flowLayout animated:YES];
-        }
+        
+        self.endReload = YES;
+        [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+            [self.collectionView reloadData];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.endReload = NO;
+            });
+        } completion:nil];
     }
 }
 
-#pragma mark - Load All Image
+- (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
+{
+    return [self supportedInterfaceOrientations];
+}
+
+- (UIInterfaceOrientationMask) supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
+}
+
+
+#pragma mark - Status Bar hidden
+
+- (void) swipe: (UIGestureRecognizer*) swipeRecognizer {
+    
+    BOOL shouldHideStatusBar = self.navigationController.navigationBar.frame.origin.y < 0;
+    self.hideStatusBar = shouldHideStatusBar;
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        [self setNeedsStatusBarAppearanceUpdate];
+    }];
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return self.hideStatusBar;
+}
+
+#pragma mark - Download Image & Load All Image
 
 -(void) generateAllImage: (NSArray <NSString*>*)imagesURLs
 {
@@ -112,17 +165,27 @@ static NSString * const reuseIdentifier = @"BreedImage";
         [self downloadImage:imageString successBlock:^(UIImage *image) {
             if (image) {
                 @synchronized (self) {
-                    self.insertProcess = YES;
                     [self.images addObject:image];
-                    [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.images.count-1 inSection:0]]];
-                    self.insertProcess = NO;
+                    if (self.images.count - 1 == self.countOfObject  && !self.endReload) {
+#warning exeption while rotate
+                        [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.images.count-1 inSection:0]]];
+                    }
+                    else {
+                        [self.collectionView reloadData];
+                        NSLog(@"11111Error while insert");
+                    }
+
+                    if (!self.firstItem) {
+                        self.navigationController.hidesBarsOnSwipe = YES;
+                        self.firstItem = YES;
+                    }
+                    [self.spinner stopAnimating];
+                    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 }
             }
         }];
     }
 }
-
-#pragma mark  Download Image
 
 - (void) downloadImage: (NSString*) urlString
           successBlock: (SuccessDownloadPhoto) successBlock {
@@ -130,7 +193,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
     NSURL *url = [NSURL URLWithString:urlString];
     NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
     
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
         if (!data||error) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -143,7 +207,9 @@ static NSString * const reuseIdentifier = @"BreedImage";
         dispatch_async(dispatch_get_main_queue(), ^{
             successBlock(image);
         });
-    }] resume];
+    }];
+    [task resume];
+    [self.downloadTasks addObject:task];
 }
 
 #pragma mark - GreedoCollectionViewLayoutDataSource
@@ -166,7 +232,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self.images count];
+    self.countOfObject = [self.images count];
+    return self.countOfObject;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -244,7 +311,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     UINavigationController *nav = [defaultStorybord instantiateViewControllerWithIdentifier:@"FullScreenVC"];
     FullScreenVC *imageFullScreen = nav.viewControllers.firstObject;
     imageFullScreen.image = image;
-    imageFullScreen.name = self.title;
+    imageFullScreen.name = self.searchName;
 
     [self presentViewController:nav animated:YES completion:nil];
 }
@@ -271,13 +338,35 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self presentViewController:searchAlert animated:YES completion:nil];
 }
 
+- (void) searchImage: (NSString*)searchString {
+    
+    [self setupTitle:searchString];
+    self.searchName = searchString;
+    
+    self.images = [NSMutableArray array];
+    
+    for (NSURLSessionDataTask *dataTask in self.downloadTasks) {
+        [dataTask cancel];
+    }
+    self.downloadTasks = [NSMutableArray array];
+    
+    [self.collectionView reloadData];
+    [self.collectionViewSizeCalculator clearCache];
+    
+    //start download spinner
+    [self.spinner startAnimating];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    [self.googleImage searchImages:searchString];
+}
+
 - (IBAction)showDogBreeds:(UIBarButtonItem *)sender {
     PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
     pickTVC = [[PickBreedsTableVC alloc] init];
     pickTVC.listOfBreeds = self.googleImage.dogBreeds;
     pickTVC.typeOfBreed = Dog;
     pickTVC.delegate = self;
-    pickTVC.title = @"Pick a breed";
+    pickTVC.title = @"Pick a dog breed";
     self.pickTVC = pickTVC;
     
     UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
@@ -290,33 +379,16 @@ static NSString * const reuseIdentifier = @"BreedImage";
     pickTVC.listOfBreeds = self.googleImage.catBreeds;
     pickTVC.typeOfBreed = Cat;
     pickTVC.delegate = self;
-    pickTVC.title = @"Pick a breed";
+    pickTVC.title = @"Pick a cat breed";
     self.pickTVC = pickTVC;
     
     UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (void) searchImage: (NSString*)searchString {
-
-    self.title = searchString;
-    self.images = [NSMutableArray array];
-    [self.collectionView reloadData];
-    [self.collectionViewSizeCalculator clearCache];
-    
-    //start download spinner
-    [self.spinner startAnimating];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    
-    [self.googleImage searchImages:searchString];
-}
-
-
 #pragma mark - SearchImagesDelegate
 
 - (void) foundImages:(NSArray<NSString *> *)images {
-    [self.spinner stopAnimating];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self generateAllImage: images];
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="oqh-Xc-tPf">
-    <device id="retina4_7" orientation="portrait">
+    <device id="ipad12_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -15,7 +15,7 @@
             <objects>
                 <collectionViewController id="8Zh-KW-7Bt" customClass="BreedCollectionView" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="fo2-23-Cn5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="1ig-3w-k2d">
@@ -55,26 +55,26 @@
                         </connections>
                     </collectionView>
                     <navigationItem key="navigationItem" id="oUw-za-gfp">
-                        <barButtonItem key="leftBarButtonItem" image="search-loop" id="DJN-uS-gYo">
-                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            <connections>
-                                <action selector="showSearchView:" destination="8Zh-KW-7Bt" id="lbj-uV-gE8"/>
-                            </connections>
-                        </barButtonItem>
-                        <rightBarButtonItems>
+                        <leftBarButtonItems>
                             <barButtonItem image="dog-icon" style="done" id="l3N-Ag-loA">
                                 <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="showDogBreeds:" destination="8Zh-KW-7Bt" id="OFU-hd-vTX"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="dog-icon" style="done" id="gkF-oF-SXg">
+                            <barButtonItem image="cat-icon" style="done" id="gkF-oF-SXg">
                                 <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="showCatsBreeds:" destination="8Zh-KW-7Bt" id="ITY-cg-UJ0"/>
                                 </connections>
                             </barButtonItem>
-                        </rightBarButtonItems>
+                        </leftBarButtonItems>
+                        <barButtonItem key="rightBarButtonItem" image="icon-search" id="DJN-uS-gYo">
+                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="showSearchView:" destination="8Zh-KW-7Bt" id="lbj-uV-gE8"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="flowLayout" destination="1ig-3w-k2d" id="Nl9-0P-7in"/>
@@ -125,11 +125,11 @@
                         <viewControllerLayoutGuide type="bottom" id="32M-Sw-INN"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="ZP7-Lk-9Hn">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" maximumZoomScale="3" translatesAutoresizingMaskIntoConstraints="NO" id="4q6-W5-2Xh">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="64" width="1024" height="1302"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="100" placeholderIntrinsicHeight="100" translatesAutoresizingMaskIntoConstraints="NO" id="onq-Jy-MjK">
                                         <rect key="frame" x="150" y="264" width="100" height="100"/>
@@ -178,7 +178,8 @@
         </scene>
     </scenes>
     <resources>
-        <image name="dog-icon" width="44" height="44"/>
-        <image name="search-loop" width="44" height="44"/>
+        <image name="cat-icon" width="22" height="22"/>
+        <image name="dog-icon" width="22" height="22"/>
+        <image name="icon-search" width="44" height="44"/>
     </resources>
 </document>
