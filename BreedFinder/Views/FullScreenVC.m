@@ -8,7 +8,7 @@
 
 #import "FullScreenVC.h"
 
-@interface FullScreenVC () <UIScrollViewDelegate>
+@interface FullScreenVC () <UINavigationControllerDelegate,UIScrollViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
@@ -27,6 +27,7 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
+    self.navigationController.delegate = self;
     self.lastZoomScale = -1;
 }
 
@@ -116,7 +117,18 @@
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         [self updateZoomAnimate:YES];
     } completion:nil];
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
+
+- (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
+{
+    return [self supportedInterfaceOrientations];
+}
+
+- (UIInterfaceOrientationMask) supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
+}
+
 
 #pragma mark - UIScrollViewDelegate
 

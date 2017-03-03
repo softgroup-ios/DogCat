@@ -12,7 +12,7 @@
 
 NSString* const cellIdentifier = @"pick_breed";
 
-@interface PickBreedsTableVC () <UITableViewDelegate,UITableViewDataSource>
+@interface PickBreedsTableVC () <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource>
 @property (strong, nonatomic) UIActivityIndicatorView *spinner;
 @end
 
@@ -22,6 +22,7 @@ NSString* const cellIdentifier = @"pick_breed";
     [super viewDidLoad];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.navigationController.delegate = self;
     
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
 
@@ -45,11 +46,23 @@ NSString* const cellIdentifier = @"pick_breed";
     }
 }
 
+#pragma mark - Landscape mode
+
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
     if (self.view.frame.size.width != size.width) {
         self.spinner.center = CGPointMake(size.width / 2, size.height / 2);
     }
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController
+{
+    return [self supportedInterfaceOrientations];
+}
+
+- (UIInterfaceOrientationMask) supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (void) setListOfBreeds:(NSArray<NSString *> *)listOfBreeds {
