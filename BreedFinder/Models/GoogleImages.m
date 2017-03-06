@@ -13,9 +13,9 @@
 
 @interface GoogleImages () <UIWebViewDelegate>
 
-@property (nonatomic,strong) NSArray* arrayOfCurrentImages;
 @property (nonatomic,strong) UIWebView* webView;
-@property (nonatomic,strong) NSString* allGooglePage;
+@property (nonatomic,strong) NSString *searchRequest;
+@property (nonatomic,assign) int startFrom;
 
 @end
 
@@ -24,12 +24,9 @@
 NSString* const dogBreed = @"https://en.wikipedia.org/wiki/List_of_dog_breeds";
 NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
 
-#pragma mark - Help methods
-
 - (instancetype)init {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         self.isDogParseReady = NO;
         dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_CONCURRENT);
         dispatch_async(queue,^{
@@ -44,47 +41,61 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
             self.isCatParseReady = YES;
             [self.delegate parseReady:self.catBreeds typeOf:Cat];
         });
+        
+        self.webView = [[UIWebView alloc]init];
+        self.webView.delegate = self;
     }
     return self;
 }
 
-- (void) searchImages: (NSString*)text {
-    
-    NSString *searchRequest = [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
-    [self loadGoogleImageFromText:searchRequest];
+#pragma mark - API methods
+
+- (void)searchImages:(NSString*)text {
+    _startFrom = 0;
+    self.searchRequest = [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+    [self loadGoogleImageFromText:self.searchRequest startFrom:self.startFrom];
 }
 
--(NSArray*) searchGoogleImagesInCurrentHTML {
+- (void)searchMore {
+    if (self.searchRequest) {
+        _startFrom++;
+        [self loadGoogleImageFromText:self.searchRequest startFrom:self.startFrom];
+    }
+}
+
+#pragma mark - Work methods
+
+- (NSArray*)searchGoogleImagesIn:(NSString*)allGooglePage {
+    
+    NSString *start = @"\\\"ou\\\":\\\""; //start \"ou\":\"
+    NSString *end = @"\\\",\\\"ow\\\""; //end     \",\"ow\"
     
     NSMutableArray* array = [NSMutableArray array];
-    NSRange nextRange = NSMakeRange(0, self.allGooglePage.length);
-    while (nextRange.location < self.allGooglePage.length) {
-        NSRange imageStartRange = [self.allGooglePage rangeOfString:@"\"ou\":\"" options:NSCaseInsensitiveSearch range:nextRange];
-        
+    NSRange nextRange = NSMakeRange(0, allGooglePage.length);
+    while (nextRange.location < allGooglePage.length) {
+        NSRange imageStartRange = [allGooglePage rangeOfString:start options:NSCaseInsensitiveSearch range:nextRange];
         if (imageStartRange.location==NSNotFound)
         {break;}
         
-        NSRange nextStepRange = NSMakeRange(imageStartRange.location + imageStartRange.length, self.allGooglePage.length - (imageStartRange.location + imageStartRange.length) - 1);
-        NSRange imageEndRange = [self.allGooglePage rangeOfString:@"\",\"ow\"" options:NSCaseInsensitiveSearch range:nextStepRange];
+        NSRange nextStepRange = NSMakeRange(imageStartRange.location + imageStartRange.length, allGooglePage.length - (imageStartRange.location + imageStartRange.length) - 1);
+        NSRange imageEndRange = [allGooglePage rangeOfString:end options:NSCaseInsensitiveSearch range:nextStepRange];
         
         if (nextStepRange.location==NSNotFound)
         {break;}
         
         NSRange imageRange = NSMakeRange(imageStartRange.location + imageStartRange.length, imageEndRange.location - (imageStartRange.location + imageStartRange.length));
         
-        NSString* image = [self.allGooglePage substringWithRange:imageRange];
+        NSString* image = [allGooglePage substringWithRange:imageRange];
+        image = [image stringByReplacingOccurrencesOfString:@"\\/" withString:@"/"];
         [array addObject:image];
-        nextRange = NSMakeRange(imageEndRange.location, self.allGooglePage.length - imageEndRange.location - 1);
+        nextRange = NSMakeRange(imageEndRange.location, allGooglePage.length - imageEndRange.location - 1);
     }
-    //"ou":"   \"ou\":\"
-    //","ow"  \",\"ow\"
     return array;
 }
 
 -(NSArray*) downloadAndParseWikiPage: (NSString*)wikiPage {
     
     NSMutableArray* array = [NSMutableArray array];
-    //NSString* wikiPage = @"https://en.wikipedia.org/wiki/List_of_dog_breeds"; //List_of_cat_breeds List_of_dog_breeds
     NSURL* wikiPageURL = [NSURL URLWithString:wikiPage];
     
     NSError* error;
@@ -122,17 +133,19 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
             }
         }
     }
+    
     return array;
 }
 
-- (void) loadGoogleImageFromText: (NSString*) text {
+- (void) loadGoogleImageFromText:(NSString*)text
+                       startFrom:(int)startFrom {
     
-    NSString* googlePage = [NSString stringWithFormat:@"https://www.google.com.ua/search?tbm=isch&q=%@",text];
+  //  NSString* googlePage = [NSString stringWithFormat:@"https://www.google.com.ua/search?tbm=isch&q=%@",text];
+    NSString* googlePage = [NSString stringWithFormat:@"https://www.google.com.ua/search?&client=safari&yv=2&q=%@&start=%d00&asearch=ichunk&tbm=isch&ijn=%d",text,startFrom,startFrom];
+    
     NSURL* googlePageURL = [NSURL URLWithString:googlePage];
     
     NSURLRequest* googleImageRequest = [NSURLRequest requestWithURL:googlePageURL];
-    self.webView = [[UIWebView alloc]init];
-    self.webView.delegate = self;
     [self.webView loadRequest:googleImageRequest];
 }
 
@@ -140,9 +153,9 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
     
     NSString* javaScriptCode = @"document.getElementsByTagName('html')[0].innerHTML";
     
-    self.allGooglePage = [self.webView stringByEvaluatingJavaScriptFromString:javaScriptCode];
+    NSString *allGooglePage = [self.webView stringByEvaluatingJavaScriptFromString:javaScriptCode];
+    NSArray *array = [self searchGoogleImagesIn:allGooglePage];
     
-    NSArray *array = [self searchGoogleImagesInCurrentHTML];
     [self.delegate foundImages:array];
 }
 

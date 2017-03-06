@@ -34,4 +34,5 @@ typedef enum : NSUInteger {
 
 
 - (void) searchImages: (NSString*)text;
+- (void) searchMore;
 @end

@@ -13,12 +13,19 @@
 #import "FullScreenVC.h"
 #import "PickBreedsTableVC.h"
 
-#define ARC4RANDOM_MAX      0x100000000
 
 
-typedef void (^SuccessDownloadPhoto)(UIImage* image);
+typedef void (^SuccessDownloadPhoto)(NSURL* imageURL);
 
+@interface ImageObject : NSObject
+@property (strong, nonatomic) NSString *imageURL;
+@property (assign, nonatomic) CGSize imageSize;
+@property (strong, nonatomic) UIImage *resizedImage;
+@end
 
+@implementation ImageObject
+
+@end
 
 
 
@@ -26,10 +33,9 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 @interface BreedCollectionView () <UINavigationControllerDelegate ,UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,NSURLSessionTaskDelegate, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
 
 @property (nonatomic, weak) IBOutlet UICollectionViewFlowLayout *flowLayout;
-@property (nonatomic,strong) NSMutableArray <UIImage*>* sourceImages;
-@property (nonatomic,strong) NSMutableArray <UIImage*>* showImages;
-@property (nonatomic,strong) NSMutableArray <NSURLSessionDataTask*>* downloadTasks;
-//@property (nonatomic,strong) NSMutableDictionary *sizeCache;
+@property (nonatomic,strong) NSMutableArray <NSValue*>* sourceSizes;
+@property (nonatomic,strong) NSMutableArray <ImageObject*>* showImages;
+@property (nonatomic,strong) NSMutableArray <NSURLSessionDownloadTask*>* downloadTasks;
 @property (nonatomic,assign) int countOfDataTask;
 
 @property (nonatomic,strong) NSString* searchName;
@@ -40,7 +46,9 @@ typedef void (^SuccessDownloadPhoto)(UIImage* image);
 
 @property (strong, nonatomic) UIActivityIndicatorView *spinner;
 @property (assign, nonatomic) BOOL hideStatusBar;
-//@property (assign, nonatomic) BOOL firstItem;
+@property (assign, nonatomic) BOOL isShowAddMoreButton;
+@property (assign, nonatomic) BOOL isAllowLoadImage;
+@property (strong, nonatomic) NSURLSession *session;
 
 @end
 
@@ -55,17 +63,14 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self initDataAndCollectionView];
 }
 
-- (void) initDataAndCollectionView {
+- (void)initDataAndCollectionView {
     self.googleImage = [[GoogleImages alloc]init];
     self.googleImage.delegate = self;
     
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
-    
     self.navigationController.delegate = self;
     
-    self.collectionView.backgroundColor = [UIColor whiteColor];
-    self.clearsSelectionOnViewWillAppear = YES;
     
     self.collectionViewSizeCalculator = [[GreedoCollectionViewLayout alloc] initWithCollectionView:self.collectionView];
     self.collectionViewSizeCalculator.dataSource = self;
@@ -73,28 +78,21 @@ static NSString * const reuseIdentifier = @"BreedImage";
     self.collectionViewSizeCalculator.fixedHeight = NO;
     
     //work with collection layout
-    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc]init];
-    flowLayout.minimumLineSpacing = 5;
-    flowLayout.minimumInteritemSpacing = 5;
-    
-    CGFloat windowWidth =  [UIApplication sharedApplication].windows.firstObject.frame.size.width;
-    flowLayout.itemSize = CGSizeMake(windowWidth/4, windowWidth/4);
-    flowLayout.headerReferenceSize = CGSizeZero;
-    flowLayout.footerReferenceSize = CGSizeZero;
-    flowLayout.sectionInset = UIEdgeInsetsZero;
-    [self.collectionView setCollectionViewLayout:flowLayout];
+    [self setupFlowLayout];
     
     //download spinner
-    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.spinner.center = CGPointMake(self.collectionView.bounds.size.width / 2, self.collectionView.bounds.size.height / 2);
-    self.spinner.hidesWhenStopped = YES;
-    [self.view addSubview:self.spinner];
+    [self setupSpinner];
+    
+    [self initSession];
     
     self.navigationController.hidesBarsOnSwipe = NO;
     [self.navigationController.barHideOnSwipeGestureRecognizer addTarget:self action:@selector(swipe:)];
+    
+    self.collectionView.backgroundColor = [UIColor whiteColor];
+    self.clearsSelectionOnViewWillAppear = YES;
 }
 
-- (void) setupTitle: (NSString*)text {
+- (void)setupTitle:(NSString*)text {
     
     UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, 40)];
     titleLabel.text = text;
@@ -105,6 +103,34 @@ static NSString * const reuseIdentifier = @"BreedImage";
     titleLabel.minimumScaleFactor = 0.5;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     self.navigationItem.titleView = titleLabel;
+}
+
+- (void)setupFlowLayout {
+    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc]init];
+    flowLayout.minimumLineSpacing = 5;
+    flowLayout.minimumInteritemSpacing = 5;
+    
+    CGFloat windowWidth =  [UIApplication sharedApplication].windows.firstObject.frame.size.width;
+    flowLayout.itemSize = CGSizeMake(windowWidth/4, windowWidth/4);
+    flowLayout.headerReferenceSize = CGSizeZero;
+    flowLayout.footerReferenceSize = CGSizeZero;
+    flowLayout.sectionInset = UIEdgeInsetsZero;
+    [self.collectionView setCollectionViewLayout:flowLayout];
+}
+
+- (void) setupSpinner {
+    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.spinner.center = CGPointMake(self.collectionView.bounds.size.width / 2, self.collectionView.bounds.size.height / 2);
+    self.spinner.hidesWhenStopped = YES;
+    [self.view addSubview:self.spinner];
+}
+
+- (void)initSession {
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    sessionConfig.HTTPMaximumConnectionsPerHost = 3;
+    sessionConfig.timeoutIntervalForResource = 120;
+    sessionConfig.timeoutIntervalForRequest = 120;
+    self.session = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
 }
 
 #pragma mark - Go to Landscape
@@ -156,36 +182,44 @@ static NSString * const reuseIdentifier = @"BreedImage";
 #pragma mark - Download Image & Load All Image
 
 - (void)generateAllImage:(NSArray <NSString*>*)imagesURLs {
-    for (NSString* imageString in imagesURLs)
-    {
-        [self downloadImage:imageString successBlock:^(UIImage *image) {
-            if (image) {
-                [self prepareToShow:image compitionBlock:^(UIImage *image) {
-                    dispatch_sync(dispatch_get_main_queue(), ^{
-                        [self addNewCell:image];
-                        self.navigationController.hidesBarsOnSwipe = YES;
-                        [self.spinner stopAnimating];
-                    });
-                }];
+    
+    _isAllowLoadImage = YES;
+    for (NSString* imageString in imagesURLs) {
+        [self downloadImage:imageString successBlock:^(NSURL *imageURL) {
+            if (imageURL) {
+                UIImage *sourceImage = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageURL.relativePath]];
+                if (!sourceImage) {
+                    return;
+                }
+                
+                [self.sourceSizes addObject:[NSValue valueWithCGSize:sourceImage.size]];
+                
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.sourceSizes.count-1 inSection:0];
+                CGSize imageSize = [self.collectionViewSizeCalculator sizeForPhotoAtIndexPath:indexPath];
+                ImageObject *imageObject = [[ImageObject alloc] init];
+                imageObject.resizedImage = [self imageWithImage:sourceImage scaledToSize:imageSize];
+                imageObject.imageURL = imageURL.relativePath;
+                imageObject.imageSize = sourceImage.size;
+                
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    if (_isAllowLoadImage) {
+                        [self addNewCell:imageObject atIndexPath:indexPath];
+                        if (_countOfDataTask < 7) {
+                            [self showAddMoreButton];
+                        }
+                    }
+                    else {
+                        [self clearCollectionView];
+                    }
+                });
             }
         }];
     }
 }
 
-- (void)prepareToShow:(UIImage*)image
-        compitionBlock:(void (^)(UIImage *image))compitionBlock {
-    
-    [self.sourceImages addObject:image];
-     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.sourceImages.count-1 inSection:0];
-    CGSize imageSize = [self.collectionViewSizeCalculator sizeForPhotoAtIndexPath:indexPath];
-    UIImage *resizeImage = [self imageWithImage:image scaledToSize:imageSize];
-    compitionBlock(resizeImage);
-}
-
-- (void)addNewCell: (UIImage*)image {
+- (void)addNewCell:(ImageObject*)imageObject atIndexPath:(NSIndexPath*)indexPath {
     [self.collectionView performBatchUpdates:^{
-        [self.showImages addObject:image];
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.showImages.count-1 inSection:0];
+        [self.showImages addObject:imageObject];
         [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
     }
     completion:nil];
@@ -195,30 +229,75 @@ static NSString * const reuseIdentifier = @"BreedImage";
          successBlock:(SuccessDownloadPhoto)successBlock {
 
     NSURL *url = [NSURL URLWithString:urlString];
+    if (!url) {
+        
+    }
     NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
     
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        self.countOfDataTask--;
-        if (!data||error) {
+    NSURLSessionDownloadTask *downloadTask = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+        if (![error.localizedDescription isEqualToString:@"cancelled"]) {
+            _countOfDataTask--;
+        }
+        
+        if (_countOfDataTask < 0) {
+            NSLog(@"_countOfDataTask: %d",_countOfDataTask);
+        }
+        if (!_countOfDataTask) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+            });
+        }
+
+        if (!location || error) {
             successBlock(nil);
             return;
         }
-        
-        UIImage *image = [[UIImage alloc]initWithData:data];
-        successBlock(image);
+        successBlock(location);
     }];
-    [task resume];
-    [self.downloadTasks addObject:task];
-    self.countOfDataTask++;
+    
+    [downloadTask resume];
+    [self.downloadTasks addObject:downloadTask];
+    _countOfDataTask++;
 }
 
-- (void) setCountOfDataTask:(int)countOfDataTask {
-    _countOfDataTask = countOfDataTask;
-    if (!countOfDataTask) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+- (void) showAddMoreButton {
+    if (_isShowAddMoreButton) {
+        
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.showImages.count-2 inSection:0];
+        [self.sourceSizes removeObjectAtIndex:indexPath.row];
+        
+        [self.collectionView performBatchUpdates:^{
+            [self.showImages removeObjectAtIndex:indexPath.row];
+            [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+        }
+        completion:nil];
+    }
+    
+    ImageObject *addMoreButton = [[ImageObject alloc] init];
+    addMoreButton.resizedImage = [UIImage imageNamed:@"add-more.png"];
+    addMoreButton.imageURL = @"add-more";
+    
+    [self.sourceSizes addObject:[NSValue valueWithCGSize:addMoreButton.resizedImage.size]];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.sourceSizes.count-1 inSection:0];
+    [self addNewCell:addMoreButton atIndexPath:indexPath];
+    _isShowAddMoreButton = YES;
+}
+
+
+- (void) removeAddMoreButton {
+    if (_isShowAddMoreButton) {
+        
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.showImages.count-1 inSection:0];
+        [self.sourceSizes removeObjectAtIndex:indexPath.row];
+        
+        [self.collectionView performBatchUpdates:^{
+            [self.showImages removeObjectAtIndex:indexPath.row];
+            [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+        }
+        completion:nil];
     }
 }
-
 #pragma mark - GreedoCollectionViewLayoutDataSource
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -226,9 +305,9 @@ static NSString * const reuseIdentifier = @"BreedImage";
 }
 
 - (CGSize)greedoCollectionViewLayout:(GreedoCollectionViewLayout *)layout originalImageSizeAtIndexPath:(NSIndexPath *)indexPath  {
-    if (indexPath.item < self.sourceImages.count) {
-        UIImage *image = [self.sourceImages objectAtIndex:indexPath.item];
-        return image.size;
+    if (indexPath.item < self.sourceSizes.count) {
+        NSValue *sizeValue = [self.sourceSizes objectAtIndex:indexPath.item];
+        return sizeValue.CGSizeValue;
     }
     
     return CGSizeMake(0.1, 0.1);
@@ -244,7 +323,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     
     BreedCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
-    cell.imageView.image = [self.showImages objectAtIndex:indexPath.row];
+    cell.imageView.image = [self.showImages objectAtIndex:indexPath.row].resizedImage;
     cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
     
     return cell;
@@ -264,7 +343,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
             newSize = CGSizeMake(toSize.width, toSize.width * imageScale);
         }
     }
-    
     UIGraphicsBeginImageContext(newSize);
     [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -294,20 +372,28 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 - (void)collectionView:(UICollectionView *)collectionView performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender {
     if (action == @selector(copy:)) {
-        UIImage *image = [self.sourceImages objectAtIndex:indexPath.item];
-        [UIPasteboard generalPasteboard].image = image;
+        ImageObject *imageObject = [self.showImages objectAtIndex:indexPath.item];
+        UIImage *sourceImage = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageObject.imageURL]];
+        [UIPasteboard generalPasteboard].image = sourceImage;
     }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    UIImage *image = [self.sourceImages objectAtIndex:indexPath.item];
-    [self openImageFullScreen:image];
+    if (_isShowAddMoreButton && indexPath.row == self.showImages.count-1) {
+        [self removeAddMoreButton];
+        [self.googleImage searchMore];
+        return;
+    }
+    
+    ImageObject *imageObject = [self.showImages objectAtIndex:indexPath.item];
+    UIImage *sourceImage = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageObject.imageURL]];
+    [self openImageFullScreen:sourceImage];
 }
 
 #pragma mark - Open Image
 
-- (void) openImageFullScreen: (UIImage*) image {
+- (void)openImageFullScreen:(UIImage*)image {
     
     UIStoryboard *defaultStorybord = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UINavigationController *nav = [defaultStorybord instantiateViewControllerWithIdentifier:@"FullScreenVC"];
@@ -340,8 +426,9 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self presentViewController:searchAlert animated:YES completion:nil];
 }
 
-- (void) searchImage: (NSString*)searchString {
+- (void)searchImage:(NSString*)searchString {
     
+    _isAllowLoadImage = NO;
     [self setupTitle:searchString];
     self.searchName = searchString;
     
@@ -380,17 +467,16 @@ static NSString * const reuseIdentifier = @"BreedImage";
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (void) clearCollectionView {
+- (void)clearCollectionView {
     
     self.navigationController.hidesBarsOnSwipe = NO;
-    
-    for (NSURLSessionDataTask *dataTask in self.downloadTasks) {
-        [dataTask cancel];
+    for (NSURLSessionDownloadTask *downloadTask in self.downloadTasks.reverseObjectEnumerator) {
+        [downloadTask cancel];
     }
     self.downloadTasks = [NSMutableArray array];
     _countOfDataTask = 0;
     
-    self.sourceImages = [NSMutableArray array];
+    self.sourceSizes = [NSMutableArray array];
     self.showImages = [NSMutableArray array];
     
     [self.collectionViewSizeCalculator clearCache];
@@ -399,12 +485,16 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 #pragma mark - SearchImagesDelegate
 
-- (void) foundImages:(NSArray<NSString *> *)images {
+- (void)foundImages:(NSArray<NSString *> *)images {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.navigationController.hidesBarsOnSwipe = YES;
+        [self.spinner stopAnimating];
+    });
     [self generateAllImage: images];
 }
 
-- (void) parseReady:(NSArray<NSString *> *)breeds
-             typeOf:(TypeOfBreed)typeOfBreed {
+- (void)parseReady:(NSArray<NSString *> *)breeds
+            typeOf:(TypeOfBreed)typeOfBreed {
     
     if (self.pickTVC.typeOfBreed == typeOfBreed) {
         self.pickTVC.listOfBreeds = breeds;
