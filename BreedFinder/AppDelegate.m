@@ -17,6 +17,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self clearTmpDirectory];
     return YES;
 }
 
@@ -44,7 +45,19 @@
 
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    
+    [self clearTmpDirectory];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma mark - Help Method
+
+- (void)clearTmpDirectory {
+    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+    for (NSString *file in tmpDirectory) {
+        NSError *error;
+        [[NSFileManager defaultManager] removeItemAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:file] error:&error];
+    }
 }
 
 

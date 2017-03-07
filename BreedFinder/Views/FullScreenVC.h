@@ -16,4 +16,5 @@
 @property (strong, nonatomic) NSString *name;
 
 - (instancetype)init NS_UNAVAILABLE;
+- (void)setFullSizeImage:(UIImage *)image;
 @end

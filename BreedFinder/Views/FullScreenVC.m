@@ -13,12 +13,14 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 
+
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintTop;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintRight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintLeft;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageConstraintBottom;
 
 @property (assign, nonatomic) CGFloat lastZoomScale;
+@property (assign, nonatomic) BOOL hideStatusBar;
 
 @end
 
@@ -29,6 +31,11 @@
     [super viewDidLoad];
     self.navigationController.delegate = self;
     self.lastZoomScale = -1;
+    
+    self.imageView.image = self.image;
+    self.scrollView.delegate = self;
+    [self updateZoomPreload];
+    [self updateConstraintsWithAnimate:NO];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -45,10 +52,16 @@
     swipe.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:swipe];
     
-    self.imageView.image = self.image;
     self.scrollView.delegate = self;
-    [self updateZoomAnimate:NO];
-    [self updateConstraintsWithAnimate:NO];
+    [self updateZoomAnimate:YES];
+    [self updateConstraintsWithAnimate:YES];
+}
+
+- (void) setFullSizeImage:(UIImage *)image {
+    _image = image;
+    self.imageView.image = image;
+    [self updateZoomAnimate:YES];
+    [self updateConstraintsWithAnimate:YES];
 }
 
 - (void) setupTitle: (NSString*)text {
@@ -64,17 +77,48 @@
     self.navigationItem.titleView = titleLabel;
 }
 
+#pragma mark - Status Bar hidden
+
+- (BOOL)prefersStatusBarHidden {
+    return self.hideStatusBar;
+}
+
 #pragma mark - Zoom Image
 
-- (void) updateZoomAnimate: (BOOL)animate {
+- (void)updateZoomAnimate:(BOOL)animate {
     if (self.image) {
-        CGFloat minZoom = MIN(self.scrollView.bounds.size.width / self.image.size.width, self.scrollView.bounds.size.height / self.image.size.height);
+        CGFloat viewWidth = self.scrollView.bounds.size.width;
+        CGFloat viewHeight = self.scrollView.bounds.size.height;
+        CGFloat minZoom = MIN(viewWidth / self.image.size.width, viewHeight / self.image.size.height);
         //if (minZoom > 1) { minZoom = 1; }
-        self.scrollView.minimumZoomScale = 1 * minZoom;
+        
+        if (minZoom > 3.f) {
+            self.scrollView.maximumZoomScale = minZoom;
+        }
+        self.scrollView.minimumZoomScale = minZoom;
         
         if (minZoom == self.lastZoomScale) { minZoom += 0.000001;}
         
         [self.scrollView setZoomScale:minZoom animated:animate];
+        self.lastZoomScale = minZoom;
+    }
+}
+
+- (void)updateZoomPreload {
+    if (self.image) {
+        CGFloat viewWidth = [UIApplication sharedApplication].keyWindow.bounds.size.width; //self.scrollView.bounds.size.width
+        CGFloat viewHeight = [UIApplication sharedApplication].keyWindow.bounds.size.height; //self.scrollView.bounds.size.height
+        CGFloat minZoom = MIN(viewWidth / self.image.size.width, viewHeight / self.image.size.height);
+        //if (minZoom > 1) { minZoom = 1; }
+        
+        if (minZoom > 3.f) {
+            self.scrollView.maximumZoomScale = minZoom;
+        }
+        self.scrollView.minimumZoomScale = minZoom;
+        
+        if (minZoom == self.lastZoomScale) { minZoom += 0.000001;}
+        
+        [self.scrollView setZoomScale:minZoom animated:NO];
         self.lastZoomScale = minZoom;
     }
 }
@@ -144,7 +188,14 @@
 #pragma mark - Actions
 
 - (void) tapAction: (UITapGestureRecognizer*)sender {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    BOOL shouldHideStatusBar = self.navigationController.navigationBar.frame.origin.y < 0;
+    self.hideStatusBar = shouldHideStatusBar;
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        [self setNeedsStatusBarAppearanceUpdate];
+    }];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self updateZoomAnimate:YES];
         [self updateConstraintsWithAnimate:YES];
     });
@@ -178,7 +229,7 @@
     
     UILabel *label = [[UILabel alloc] init];
     label.text = @"Saved";
-    label.font = [UIFont systemFontOfSize:23.f];
+    label.font = [UIFont systemFontOfSize:32.f];
     label.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
     [label sizeToFit];
     
@@ -187,10 +238,10 @@
     [label setFrame:CGRectMake(xpos, ypos, label.frame.size.width, label.frame.size.height)];
     [view addSubview:label];
     
-    [UIView animateWithDuration:0.7f animations:^{
-        [view setAlpha:0.85f];
+    [UIView animateWithDuration:1.3f animations:^{
+        [view setAlpha:0.95f];
     } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.3 animations:^{
+        [UIView animateWithDuration:0.6 animations:^{
             [view setAlpha:0.0f];
         }];
     }];

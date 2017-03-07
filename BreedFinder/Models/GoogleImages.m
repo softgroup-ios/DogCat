@@ -30,14 +30,14 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
         self.isDogParseReady = NO;
         dispatch_queue_t queue = dispatch_queue_create("queue", DISPATCH_QUEUE_CONCURRENT);
         dispatch_async(queue,^{
-            self.dogBreeds = [self downloadAndParseWikiPage:dogBreed];
+            self.dogBreeds = [self downloadAndParseWikiPage:dogBreed forBreed:@"dog"];
             self.isDogParseReady = YES;
             [self.delegate parseReady:self.dogBreeds typeOf:Dog];
         });
         
         self.isCatParseReady = NO;
         dispatch_async(queue,^{
-            self.catBreeds = [self downloadAndParseWikiPage:catBreed];
+            self.catBreeds = [self downloadAndParseWikiPage:catBreed forBreed:@"cat"];
             self.isCatParseReady = YES;
             [self.delegate parseReady:self.catBreeds typeOf:Cat];
         });
@@ -51,6 +51,10 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
 #pragma mark - API methods
 
 - (void)searchImages:(NSString*)text {
+    if (!text || [text isEqualToString:@""]) {
+        [self.delegate foundImages:nil];
+        return;
+    }
     _startFrom = 0;
     self.searchRequest = [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     [self loadGoogleImageFromText:self.searchRequest startFrom:self.startFrom];
@@ -93,7 +97,7 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
     return array;
 }
 
--(NSArray*) downloadAndParseWikiPage: (NSString*)wikiPage {
+-(NSArray*)downloadAndParseWikiPage:(NSString*)wikiPage forBreed:(NSString*)breedType {
     
     NSMutableArray* array = [NSMutableArray array];
     NSURL* wikiPageURL = [NSURL URLWithString:wikiPage];
@@ -128,6 +132,9 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
                 
                 NSRange breedRange = NSMakeRange(startBreedRange.location + startBreedRange.length, endBreedRange.location - (startBreedRange.location + startBreedRange.length));
                 NSString* breed = [allWikiPage substringWithRange:breedRange];
+                if (![breed localizedCaseInsensitiveContainsString:breedType]) {
+                    breed = [breed stringByAppendingFormat:@" %@",breedType];
+                }
                 [array addObject:breed];
                 startFrom = breedRange.location + breedRange.length;
             }
@@ -137,8 +144,7 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
     return array;
 }
 
-- (void) loadGoogleImageFromText:(NSString*)text
-                       startFrom:(int)startFrom {
+- (void) loadGoogleImageFromText:(NSString*)text startFrom:(int)startFrom {
     
   //  NSString* googlePage = [NSString stringWithFormat:@"https://www.google.com.ua/search?tbm=isch&q=%@",text];
     NSString* googlePage = [NSString stringWithFormat:@"https://www.google.com.ua/search?&client=safari&yv=2&q=%@&start=%d00&asearch=ichunk&tbm=isch&ijn=%d",text,startFrom,startFrom];

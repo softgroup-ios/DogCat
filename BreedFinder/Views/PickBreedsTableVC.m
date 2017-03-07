@@ -12,8 +12,12 @@
 
 NSString* const cellIdentifier = @"pick_breed";
 
-@interface PickBreedsTableVC () <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource>
+@interface PickBreedsTableVC () <UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate>
+
+@property (strong, nonatomic) NSArray <NSString*> *searchResult;
 @property (strong, nonatomic) UIActivityIndicatorView *spinner;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+
 @end
 
 @implementation PickBreedsTableVC
@@ -22,6 +26,7 @@ NSString* const cellIdentifier = @"pick_breed";
     [super viewDidLoad];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.searchBar.delegate = self;
     self.navigationController.delegate = self;
     
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
@@ -34,6 +39,8 @@ NSString* const cellIdentifier = @"pick_breed";
 - (void) viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
+    self.searchResult = self.listOfBreeds;
+    
     if (!self.listOfBreeds) {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.tableView reloadData];
@@ -46,6 +53,54 @@ NSString* const cellIdentifier = @"pick_breed";
     }
 }
 
+- (void) setListOfBreeds:(NSArray<NSString *> *)listOfBreeds {
+    _listOfBreeds = listOfBreeds;
+    if (_listOfBreeds) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.spinner stopAnimating];
+            self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+            self.searchResult = listOfBreeds;
+            [self.tableView reloadData];
+        });
+    }
+}
+
+#pragma mark - Search Action
+
+- (void) filterContentForSearch:(NSString*)searchText {
+    
+    if (!searchText || [searchText isEqualToString:@""]) {
+        self.searchResult = self.listOfBreeds;
+        [self.tableView reloadData];
+        return;
+    }
+    
+    NSPredicate *searchPredicate = [NSPredicate predicateWithFormat:@"SELF contains[c] %@", searchText];
+    self.searchResult = [self.listOfBreeds filteredArrayUsingPredicate:searchPredicate];
+    [self.tableView reloadData];
+}
+
+#pragma mark - UISearchBarDelegate
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    [searchBar setShowsCancelButton:YES animated:YES];
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
+     [self filterContentForSearch:searchBar.text];
+}
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    [self.searchBar resignFirstResponder];
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    [self.searchBar resignFirstResponder];
+    [searchBar setShowsCancelButton:NO animated:YES];
+}
+
+
+
 #pragma mark - Landscape mode
 
 - (void)viewWillTransitionToSize:(CGSize)size
@@ -53,6 +108,7 @@ NSString* const cellIdentifier = @"pick_breed";
     if (self.view.frame.size.width != size.width) {
         self.spinner.center = CGPointMake(size.width / 2, size.height / 2);
     }
+    [self.searchBar resignFirstResponder];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
@@ -65,13 +121,6 @@ NSString* const cellIdentifier = @"pick_breed";
     return UIInterfaceOrientationMaskAll;
 }
 
-- (void) setListOfBreeds:(NSArray<NSString *> *)listOfBreeds {
-    _listOfBreeds = listOfBreeds;
-    [self.spinner stopAnimating];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    [self.tableView reloadData];
-}
-
 #pragma mark - Action
 
 - (void) cancelAction: (UIBarButtonItem*)sender {
@@ -81,17 +130,14 @@ NSString* const cellIdentifier = @"pick_breed";
 #pragma mark - UITableViewDelegate UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.listOfBreeds count];
+    return [self.searchResult count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (!cell) {
-        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-    }
     
-    NSString *breed = [self.listOfBreeds objectAtIndex:indexPath.item];
+    NSString *breed = [self.searchResult objectAtIndex:indexPath.item];
     cell.textLabel.text = breed;
     
     return cell;
@@ -100,8 +146,13 @@ NSString* const cellIdentifier = @"pick_breed";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self dismissViewControllerAnimated:YES completion:nil];
     
-    NSString *breed = [self.listOfBreeds objectAtIndex:indexPath.item];
+    NSString *breed = [self.searchResult objectAtIndex:indexPath.item];
     [self.delegate searchImage:breed];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self.searchBar resignFirstResponder];
+    [self.searchBar setShowsCancelButton:NO animated:YES];
 }
 
 @end

@@ -203,6 +203,9 @@ static NSString * const reuseIdentifier = @"BreedImage";
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     if (_isAllowLoadImage) {
+                        if (!self.navigationController.hidesBarsOnSwipe) {
+                            self.navigationController.hidesBarsOnSwipe = YES;
+                        }
                         [self addNewCell:imageObject atIndexPath:indexPath];
                         if (_countOfDataTask < 7) {
                             [self showAddMoreButton];
@@ -238,17 +241,17 @@ static NSString * const reuseIdentifier = @"BreedImage";
         
         if (![error.localizedDescription isEqualToString:@"cancelled"]) {
             _countOfDataTask--;
+            if (!_countOfDataTask) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                });
+            }
         }
         
         if (_countOfDataTask < 0) {
-            NSLog(@"_countOfDataTask: %d",_countOfDataTask);
+            // some go wrong
         }
-        if (!_countOfDataTask) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            });
-        }
-
+        
         if (!location || error) {
             successBlock(nil);
             return;
@@ -322,9 +325,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
     BreedCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
-    
     cell.imageView.image = [self.showImages objectAtIndex:indexPath.row].resizedImage;
-    cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
     
     return cell;
 }
@@ -360,7 +361,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     return YES;
 }
 
-#pragma mark - Copy Action
+#pragma mark - Copy menu Action
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
@@ -383,25 +384,29 @@ static NSString * const reuseIdentifier = @"BreedImage";
     if (_isShowAddMoreButton && indexPath.row == self.showImages.count-1) {
         [self removeAddMoreButton];
         [self.googleImage searchMore];
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+        _isShowAddMoreButton = NO;
         return;
     }
     
     ImageObject *imageObject = [self.showImages objectAtIndex:indexPath.item];
-    UIImage *sourceImage = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageObject.imageURL]];
-    [self openImageFullScreen:sourceImage];
+    [self openImageFullScreen:imageObject];
 }
 
 #pragma mark - Open Image
 
-- (void)openImageFullScreen:(UIImage*)image {
+- (void)openImageFullScreen:(ImageObject*)imageObject {
     
     UIStoryboard *defaultStorybord = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UINavigationController *nav = [defaultStorybord instantiateViewControllerWithIdentifier:@"FullScreenVC"];
+    
     FullScreenVC *imageFullScreen = nav.viewControllers.firstObject;
-    imageFullScreen.image = image;
     imageFullScreen.name = self.searchName;
-
+    imageFullScreen.image = imageObject.resizedImage;
     [self presentViewController:nav animated:YES completion:nil];
+    
+    UIImage *sourceImage = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageObject.imageURL]];
+    [imageFullScreen setFullSizeImage:sourceImage];
 }
 
 #pragma mark - Search Action
@@ -442,8 +447,10 @@ static NSString * const reuseIdentifier = @"BreedImage";
 }
 
 - (IBAction)showDogBreeds:(UIBarButtonItem *)sender {
-    PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
-    pickTVC = [[PickBreedsTableVC alloc] init];
+    
+    UIStoryboard *defaultStorybord = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    PickBreedsTableVC *pickTVC = [defaultStorybord instantiateViewControllerWithIdentifier:@"PickBreedsTableVC"];
+    
     pickTVC.listOfBreeds = self.googleImage.dogBreeds;
     pickTVC.typeOfBreed = Dog;
     pickTVC.delegate = self;
@@ -455,8 +462,10 @@ static NSString * const reuseIdentifier = @"BreedImage";
 }
 
 - (IBAction)showCatsBreeds:(UIBarButtonItem *)sender {
-    PickBreedsTableVC *pickTVC = [[PickBreedsTableVC alloc] init];
-    pickTVC = [[PickBreedsTableVC alloc] init];
+    
+    UIStoryboard *defaultStorybord = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    PickBreedsTableVC *pickTVC = [defaultStorybord instantiateViewControllerWithIdentifier:@"PickBreedsTableVC"];
+    
     pickTVC.listOfBreeds = self.googleImage.catBreeds;
     pickTVC.typeOfBreed = Cat;
     pickTVC.delegate = self;
@@ -487,7 +496,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 - (void)foundImages:(NSArray<NSString *> *)images {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.navigationController.hidesBarsOnSwipe = YES;
         [self.spinner stopAnimating];
     });
     [self generateAllImage: images];
