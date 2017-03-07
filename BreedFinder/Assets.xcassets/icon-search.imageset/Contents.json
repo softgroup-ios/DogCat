@@ -2,15 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "1488485372_icon-111-search.png",
+      "filename" : "1488915336_Find01-2.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "1488915336_Find01-1.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
+      "filename" : "1488915336_Find01.png",
       "scale" : "3x"
     }
   ],

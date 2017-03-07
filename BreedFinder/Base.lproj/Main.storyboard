@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="oqh-Xc-tPf">
-    <device id="retina3_5" orientation="portrait">
+    <device id="ipad12_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,9 +17,9 @@
             <objects>
                 <collectionViewController id="8Zh-KW-7Bt" customClass="BreedCollectionView" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="fo2-23-Cn5">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803915" alpha="1" colorSpace="calibratedRGB"/>
                         <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="1ig-3w-k2d">
                             <size key="itemSize" width="100" height="100"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -54,28 +56,30 @@
                             <outlet property="delegate" destination="8Zh-KW-7Bt" id="its-eW-ZyF"/>
                         </connections>
                     </collectionView>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="oUw-za-gfp">
                         <leftBarButtonItems>
-                            <barButtonItem image="dog-icon" style="done" id="l3N-Ag-loA">
-                                <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <barButtonItem image="dog-icon" id="l3N-Ag-loA">
+                                <color key="tintColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.29019607843137252" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="showDogBreeds:" destination="8Zh-KW-7Bt" id="OFU-hd-vTX"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="cat-icon" style="done" id="gkF-oF-SXg">
-                                <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <barButtonItem image="cat-icon" id="gkF-oF-SXg">
+                                <color key="tintColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.29019607843137252" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="showCatsBreeds:" destination="8Zh-KW-7Bt" id="ITY-cg-UJ0"/>
                                 </connections>
                             </barButtonItem>
                         </leftBarButtonItems>
                         <barButtonItem key="rightBarButtonItem" image="icon-search" id="DJN-uS-gYo">
-                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.29019607843137252" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="showSearchView:" destination="8Zh-KW-7Bt" id="lbj-uV-gE8"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="flowLayout" destination="1ig-3w-k2d" id="Nl9-0P-7in"/>
                     </connections>
@@ -89,11 +93,11 @@
             <objects>
                 <tableViewController storyboardIdentifier="PickBreedsTableVC" id="Mmh-wF-byY" customClass="PickBreedsTableVC" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="OKx-5K-0lQ">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803915" alpha="1" colorSpace="calibratedRGB"/>
                         <searchBar key="tableHeaderView" contentMode="redraw" id="eYu-pg-iWO">
-                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                            <rect key="frame" x="0.0" y="0.0" width="1024" height="44"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <textInputTraits key="textInputTraits"/>
                             <connections>
@@ -101,23 +105,39 @@
                             </connections>
                         </searchBar>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="pick_breed" textLabel="OgV-aB-LkL" style="IBUITableViewCellStyleDefault" id="r4J-Su-fi1">
-                                <rect key="frame" x="0.0" y="72" width="320" height="44"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="gray" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="pick_breed" id="r4J-Su-fi1" customClass="BreedNameCell">
+                                <rect key="frame" x="0.0" y="72" width="1024" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="r4J-Su-fi1" id="ppm-RZ-bVA">
-                                    <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="830" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Name of breed" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OgV-aB-LkL">
-                                            <rect key="frame" x="15" y="0.0" width="270" height="43"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                            <nil key="textColor"/>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dot" translatesAutoresizingMaskIntoConstraints="NO" id="0yr-L5-rZ9">
+                                            <rect key="frame" x="8" y="13.5" width="17.5" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="0yr-L5-rZ9" secondAttribute="height" multiplier="1:1" id="vPy-OU-5Yc"/>
+                                            </constraints>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dalmantin dog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p0q-5g-sKn">
+                                            <rect key="frame" x="35.5" y="10" width="123.5" height="23"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                            <color key="textColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.39215686274509803" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="p0q-5g-sKn" firstAttribute="centerY" secondItem="0yr-L5-rZ9" secondAttribute="centerY" id="6eo-zH-9Gl"/>
+                                        <constraint firstAttribute="leadingMargin" secondItem="0yr-L5-rZ9" secondAttribute="leading" id="9p8-0O-HXz"/>
+                                        <constraint firstItem="0yr-L5-rZ9" firstAttribute="height" secondItem="ppm-RZ-bVA" secondAttribute="height" multiplier="0.4" id="Y69-6h-ZN4"/>
+                                        <constraint firstItem="0yr-L5-rZ9" firstAttribute="centerY" secondItem="ppm-RZ-bVA" secondAttribute="centerY" id="ozH-V8-yTQ"/>
+                                        <constraint firstItem="p0q-5g-sKn" firstAttribute="leading" secondItem="0yr-L5-rZ9" secondAttribute="trailing" constant="10" id="xgu-6h-5OA"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <connections>
+                                    <outlet property="imageForCell" destination="0yr-L5-rZ9" id="KYH-L7-JQP"/>
+                                    <outlet property="label" destination="p0q-5g-sKn" id="gum-OA-EYf"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -183,11 +203,11 @@
                         <viewControllerLayoutGuide type="bottom" id="32M-Sw-INN"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="ZP7-Lk-9Hn">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" maximumZoomScale="3" translatesAutoresizingMaskIntoConstraints="NO" id="4q6-W5-2Xh">
-                                <rect key="frame" x="0.0" y="64" width="320" height="416"/>
+                                <rect key="frame" x="0.0" y="64" width="1024" height="1302"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="100" placeholderIntrinsicHeight="100" translatesAutoresizingMaskIntoConstraints="NO" id="onq-Jy-MjK">
                                         <rect key="frame" x="150" y="264" width="100" height="100"/>
@@ -211,11 +231,13 @@
                     </view>
                     <navigationItem key="navigationItem" title="Name of breed" id="OYF-Yx-dkf">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="IJY-Y6-BIK">
+                            <color key="tintColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.39215686274509803" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="cancelFullImage:" destination="3X4-UM-1Gs" id="0nI-wm-8gm"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="save" id="WPi-xX-j2D">
+                            <color key="tintColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.39215686274509803" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="saveToGallery:" destination="3X4-UM-1Gs" id="lhd-Jl-mZ6"/>
                             </connections>
@@ -232,12 +254,13 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J69-9o-Smw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2258" y="-297"/>
+            <point key="canvasLocation" x="2755" y="-297"/>
         </scene>
     </scenes>
     <resources>
         <image name="cat-icon" width="22" height="22"/>
         <image name="dog-icon" width="22" height="22"/>
-        <image name="icon-search" width="44" height="44"/>
+        <image name="dot" width="200" height="200"/>
+        <image name="icon-search" width="22" height="22"/>
     </resources>
 </document>

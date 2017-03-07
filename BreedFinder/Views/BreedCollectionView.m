@@ -12,6 +12,7 @@
 #import "GreedoCollectionViewLayout.h"
 #import "FullScreenVC.h"
 #import "PickBreedsTableVC.h"
+#import "UIScrollView+EmptyDataSet.h"
 
 
 
@@ -30,7 +31,7 @@ typedef void (^SuccessDownloadPhoto)(NSURL* imageURL);
 
 
 
-@interface BreedCollectionView () <UINavigationControllerDelegate ,UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,NSURLSessionTaskDelegate, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate>
+@interface BreedCollectionView () <UINavigationControllerDelegate ,UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,NSURLSessionTaskDelegate, GreedoCollectionViewLayoutDataSource, SuccessPickBreedDelegate, SearchImagesDelegate,DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property (nonatomic, weak) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic,strong) NSMutableArray <NSValue*>* sourceSizes;
@@ -48,6 +49,7 @@ typedef void (^SuccessDownloadPhoto)(NSURL* imageURL);
 @property (assign, nonatomic) BOOL hideStatusBar;
 @property (assign, nonatomic) BOOL isShowAddMoreButton;
 @property (assign, nonatomic) BOOL isAllowLoadImage;
+@property (assign, nonatomic) BOOL isEndLoading;
 @property (strong, nonatomic) NSURLSession *session;
 
 @end
@@ -77,6 +79,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
     self.collectionViewSizeCalculator.rowMaximumHeight = CGRectGetHeight(self.collectionView.bounds) / 3;
     self.collectionViewSizeCalculator.fixedHeight = NO;
     
+    [self setupEmptyDataSet];
+    
     //work with collection layout
     [self setupFlowLayout];
     
@@ -88,8 +92,12 @@ static NSString * const reuseIdentifier = @"BreedImage";
     self.navigationController.hidesBarsOnSwipe = NO;
     [self.navigationController.barHideOnSwipeGestureRecognizer addTarget:self action:@selector(swipe:)];
     
-    self.collectionView.backgroundColor = [UIColor whiteColor];
     self.clearsSelectionOnViewWillAppear = YES;
+}
+
+- (void) setupEmptyDataSet {
+    self.collectionView.emptyDataSetSource = self;
+    self.collectionView.emptyDataSetDelegate = self;
 }
 
 - (void)setupTitle:(NSString*)text {
@@ -203,12 +211,17 @@ static NSString * const reuseIdentifier = @"BreedImage";
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     if (_isAllowLoadImage) {
-                        if (!self.navigationController.hidesBarsOnSwipe) {
-                            self.navigationController.hidesBarsOnSwipe = YES;
-                        }
+                        
                         [self addNewCell:imageObject atIndexPath:indexPath];
                         if (_countOfDataTask < 7) {
                             [self showAddMoreButton];
+                        }
+                        
+                        if (!_isEndLoading) {
+                            [self.spinner stopAnimating];
+                            [self.collectionView reloadEmptyDataSet];
+                            self.navigationController.hidesBarsOnSwipe = YES;
+                            _isEndLoading = YES;
                         }
                     }
                     else {
@@ -233,7 +246,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {
-        
+        return;
     }
     NSURLRequest *request = [[NSURLRequest alloc]initWithURL:url];
     
@@ -422,7 +435,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
         [self searchImage:text];
     }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        
+        [searchAlert.textFields.firstObject resignFirstResponder];
     }];
     
     [searchAlert addAction:ok];
@@ -433,7 +446,12 @@ static NSString * const reuseIdentifier = @"BreedImage";
 
 - (void)searchImage:(NSString*)searchString {
     
+    if (!searchString || [searchString isEqualToString:@""]) {
+        return;
+    }
+    
     _isAllowLoadImage = NO;
+    _isEndLoading = NO;
     [self setupTitle:searchString];
     self.searchName = searchString;
     
@@ -495,9 +513,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
 #pragma mark - SearchImagesDelegate
 
 - (void)foundImages:(NSArray<NSString *> *)images {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.spinner stopAnimating];
-    });
     [self generateAllImage: images];
 }
 
@@ -507,6 +522,35 @@ static NSString * const reuseIdentifier = @"BreedImage";
     if (self.pickTVC.typeOfBreed == typeOfBreed) {
         self.pickTVC.listOfBreeds = breeds;
     }
+}
+
+#pragma mark - DZNEmptyDataSetSource and DZNEmptyDataSetDelegate
+
+- (BOOL)emptyDataSetShouldAllowScroll:(UIScrollView *)scrollView {
+    return YES;
+}
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+    NSString *text = @"Please Allow Photo Access";
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
+                                 NSForegroundColorAttributeName: [UIColor darkGrayColor]};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView {
+    NSString *text = @"This allows you to share photos from your library and save photos to your camera roll.";
+    
+    NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
+    paragraph.lineBreakMode = NSLineBreakByWordWrapping;
+    paragraph.alignment = NSTextAlignmentCenter;
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14.0f],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor],
+                                 NSParagraphStyleAttributeName: paragraph};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
 @end

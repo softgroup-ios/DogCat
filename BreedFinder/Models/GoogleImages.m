@@ -51,10 +51,6 @@ NSString* const catBreed = @"https://en.wikipedia.org/wiki/List_of_cat_breeds";
 #pragma mark - API methods
 
 - (void)searchImages:(NSString*)text {
-    if (!text || [text isEqualToString:@""]) {
-        [self.delegate foundImages:nil];
-        return;
-    }
     _startFrom = 0;
     self.searchRequest = [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     [self loadGoogleImageFromText:self.searchRequest startFrom:self.startFrom];

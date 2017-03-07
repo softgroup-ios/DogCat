@@ -31,11 +31,6 @@
     [super viewDidLoad];
     self.navigationController.delegate = self;
     self.lastZoomScale = -1;
-    
-    self.imageView.image = self.image;
-    self.scrollView.delegate = self;
-    [self updateZoomPreload];
-    [self updateConstraintsWithAnimate:NO];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -52,9 +47,10 @@
     swipe.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:swipe];
     
+    self.imageView.image = self.image;
     self.scrollView.delegate = self;
-    [self updateZoomAnimate:YES];
-    [self updateConstraintsWithAnimate:YES];
+    [self updateZoomAnimate:NO];
+    [self updateConstraintsWithAnimate:NO];
 }
 
 - (void) setFullSizeImage:(UIImage *)image {

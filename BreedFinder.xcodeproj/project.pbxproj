@@ -19,6 +19,8 @@
 		84D135821E5C8F02007BE924 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D135801E5C8F02007BE924 /* LaunchScreen.storyboard */; };
 		84D1358E1E5C8FFC007BE924 /* GoogleImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1358B1E5C8FFC007BE924 /* GoogleImages.m */; };
 		84D135961E5C939F007BE924 /* BreedCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D135951E5C939F007BE924 /* BreedCollectionView.m */; };
+		975D03881E6F022A002459DD /* BreedNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 975D03871E6F022A002459DD /* BreedNameCell.m */; };
+		975D038C1E6F02AF002459DD /* UIScrollView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 975D038B1E6F02AF002459DD /* UIScrollView+EmptyDataSet.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +47,10 @@
 		84D1358B1E5C8FFC007BE924 /* GoogleImages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GoogleImages.m; path = Models/GoogleImages.m; sourceTree = "<group>"; };
 		84D135941E5C939F007BE924 /* BreedCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedCollectionView.h; path = Views/BreedCollectionView.h; sourceTree = "<group>"; };
 		84D135951E5C939F007BE924 /* BreedCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BreedCollectionView.m; path = Views/BreedCollectionView.m; sourceTree = "<group>"; };
+		975D03861E6F022A002459DD /* BreedNameCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreedNameCell.h; path = Cells/BreedNameCell.h; sourceTree = "<group>"; };
+		975D03871E6F022A002459DD /* BreedNameCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BreedNameCell.m; path = Cells/BreedNameCell.m; sourceTree = "<group>"; };
+		975D038A1E6F02AF002459DD /* UIScrollView+EmptyDataSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIScrollView+EmptyDataSet.h"; path = "libs/DZNEmptyDataSet/UIScrollView+EmptyDataSet.h"; sourceTree = "<group>"; };
+		975D038B1E6F02AF002459DD /* UIScrollView+EmptyDataSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIScrollView+EmptyDataSet.m"; path = "libs/DZNEmptyDataSet/UIScrollView+EmptyDataSet.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +69,8 @@
 			children = (
 				842812AE1E5EDDB700891079 /* BreedCell.h */,
 				842812AF1E5EDDB700891079 /* BreedCell.m */,
+				975D03861E6F022A002459DD /* BreedNameCell.h */,
+				975D03871E6F022A002459DD /* BreedNameCell.m */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -70,6 +78,7 @@
 		842AAF461E5DACC100B7B3ED /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				975D03891E6F02A1002459DD /* DZNEmptyDataSet */,
 				842AAF471E5DACDE00B7B3ED /* GreedoLayout */,
 			);
 			name = libs;
@@ -160,6 +169,15 @@
 			name = Views;
 			sourceTree = "<group>";
 		};
+		975D03891E6F02A1002459DD /* DZNEmptyDataSet */ = {
+			isa = PBXGroup;
+			children = (
+				975D038A1E6F02AF002459DD /* UIScrollView+EmptyDataSet.h */,
+				975D038B1E6F02AF002459DD /* UIScrollView+EmptyDataSet.m */,
+			);
+			name = DZNEmptyDataSet;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -232,6 +250,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				975D038C1E6F02AF002459DD /* UIScrollView+EmptyDataSet.m in Sources */,
 				84D135771E5C8F02007BE924 /* AppDelegate.m in Sources */,
 				842AAF4D1E5DACDE00B7B3ED /* GreedoSizeCalculator.m in Sources */,
 				84D1358E1E5C8FFC007BE924 /* GoogleImages.m in Sources */,
@@ -239,6 +258,7 @@
 				84D135961E5C939F007BE924 /* BreedCollectionView.m in Sources */,
 				842812A61E5EDAFB00891079 /* FullScreenVC.m in Sources */,
 				842812B01E5EDDB700891079 /* BreedCell.m in Sources */,
+				975D03881E6F022A002459DD /* BreedNameCell.m in Sources */,
 				842812AD1E5EDD9A00891079 /* PickBreedsTableVC.m in Sources */,
 				84D135741E5C8F02007BE924 /* main.m in Sources */,
 			);

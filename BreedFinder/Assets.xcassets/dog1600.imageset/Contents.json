@@ -2,17 +2,15 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "dog-icon-20.png",
+      "filename" : "dog1600.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "dog-icon-19.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "dog-icon-18.png",
       "scale" : "3x"
     }
   ],

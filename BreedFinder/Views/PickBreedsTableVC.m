@@ -7,6 +7,7 @@
 //
 
 #import "PickBreedsTableVC.h"
+#import "BreedNameCell.h"
 
 
 
@@ -33,6 +34,7 @@ NSString* const cellIdentifier = @"pick_breed";
 
     self.clearsSelectionOnViewWillAppear = NO;
     UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAction:)];
+    cancelButton.tintColor = [UIColor colorWithRed:0.28 green:0.28 blue:0.39 alpha:1.0];
     self.navigationItem.leftBarButtonItem = cancelButton;
 }
 
@@ -95,6 +97,8 @@ NSString* const cellIdentifier = @"pick_breed";
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    searchBar.text = @"";
+    [self filterContentForSearch:nil];
     [self.searchBar resignFirstResponder];
     [searchBar setShowsCancelButton:NO animated:YES];
 }
@@ -135,10 +139,10 @@ NSString* const cellIdentifier = @"pick_breed";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    
     NSString *breed = [self.searchResult objectAtIndex:indexPath.item];
-    cell.textLabel.text = breed;
+    BreedNameCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    
+    cell.label.text = breed;
     
     return cell;
 }
