@@ -28,7 +28,9 @@ With this program you can search images many of dog/cat breeds and with any of y
 
 ## DEMO
 
+<p align="center">
 <img src="ReadmeResources/readme.gif" height="500"/>
+</p>
 
 ## LICENSE
 
