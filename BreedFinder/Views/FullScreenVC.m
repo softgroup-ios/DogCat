@@ -64,11 +64,10 @@
     
     UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, 40)];
     titleLabel.text = text;
+    titleLabel.font = [UIFont fontWithName:@"Kailasa" size:18.f];
     titleLabel.backgroundColor = [UIColor clearColor];
     titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    titleLabel.numberOfLines = 0;
-    titleLabel.adjustsFontSizeToFitWidth = YES; // As alternative you can also make it multi-line.
-    titleLabel.minimumScaleFactor = 0.5;
+    titleLabel.numberOfLines = 1;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     self.navigationItem.titleView = titleLabel;
 }

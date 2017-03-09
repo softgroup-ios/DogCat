@@ -25,7 +25,6 @@ typedef void (^SuccessDownloadPhoto)(NSURL* imageURL);
 @end
 
 @implementation ImageObject
-
 @end
 
 
@@ -50,6 +49,7 @@ typedef void (^SuccessDownloadPhoto)(NSURL* imageURL);
 @property (assign, nonatomic) BOOL isShowAddMoreButton;
 @property (assign, nonatomic) BOOL isAllowLoadImage;
 @property (assign, nonatomic) BOOL isEndLoading;
+@property (assign, nonatomic) int leastToShowAddMore;
 @property (strong, nonatomic) NSURLSession *session;
 
 @end
@@ -104,11 +104,10 @@ static NSString * const reuseIdentifier = @"BreedImage";
     
     UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, 40)];
     titleLabel.text = text;
+    titleLabel.font = [UIFont fontWithName:@"Kailasa" size:18.f];
     titleLabel.backgroundColor = [UIColor clearColor];
     titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    titleLabel.numberOfLines = 0;
-    titleLabel.adjustsFontSizeToFitWidth = YES; // As alternative you can also make it multi-line.
-    titleLabel.minimumScaleFactor = 0.5;
+    titleLabel.numberOfLines = 1;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     self.navigationItem.titleView = titleLabel;
 }
@@ -194,28 +193,29 @@ static NSString * const reuseIdentifier = @"BreedImage";
     _isAllowLoadImage = YES;
     for (NSString* imageString in imagesURLs) {
         [self downloadImage:imageString successBlock:^(NSURL *imageURL) {
+            
+            ImageObject *imageObject;
+            NSIndexPath *indexPath;
             if (imageURL) {
                 UIImage *sourceImage = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageURL.relativePath]];
-                if (!sourceImage) {
-                    return;
+                if (sourceImage) {
+                    [self.sourceSizes addObject:[NSValue valueWithCGSize:sourceImage.size]];
+                    
+                    indexPath = [NSIndexPath indexPathForRow:self.sourceSizes.count-1 inSection:0];
+                    CGSize imageSize = [self.collectionViewSizeCalculator sizeForPhotoAtIndexPath:indexPath];
+                    imageObject = [[ImageObject alloc] init];
+                    imageObject.resizedImage = [self imageWithImage:sourceImage scaledToSize:imageSize];
+                    imageObject.imageURL = imageURL.relativePath;
+                    imageObject.imageSize = sourceImage.size;
                 }
-                
-                [self.sourceSizes addObject:[NSValue valueWithCGSize:sourceImage.size]];
-                
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.sourceSizes.count-1 inSection:0];
-                CGSize imageSize = [self.collectionViewSizeCalculator sizeForPhotoAtIndexPath:indexPath];
-                ImageObject *imageObject = [[ImageObject alloc] init];
-                imageObject.resizedImage = [self imageWithImage:sourceImage scaledToSize:imageSize];
-                imageObject.imageURL = imageURL.relativePath;
-                imageObject.imageSize = sourceImage.size;
-                
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    if (_isAllowLoadImage) {
-                        
+            }
+            
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                if (_isAllowLoadImage) {
+                    
+                    _countOfDataTask--;
+                    if (imageObject && indexPath) {
                         [self addNewCell:imageObject atIndexPath:indexPath];
-                        if (_countOfDataTask < 7) {
-                            [self showAddMoreButton];
-                        }
                         
                         if (!_isEndLoading) {
                             [self.spinner stopAnimating];
@@ -223,22 +223,38 @@ static NSString * const reuseIdentifier = @"BreedImage";
                             self.navigationController.hidesBarsOnSwipe = YES;
                             _isEndLoading = YES;
                         }
+                        
+                        if (_countOfDataTask <= _leastToShowAddMore) {
+                            [self showAddMoreButton];
+                        }
                     }
-                    else {
-                        [self clearCollectionView];
+                    else if ((_countOfDataTask <= _leastToShowAddMore) && !self.isShowAddMoreButton) {
+                        [self showAddMoreButton];
                     }
-                });
-            }
+                    
+                    if (_countOfDataTask <= 0) {
+                        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                    }
+                }
+                else {
+                    [self clearCollectionView];
+                }
+            });
         }];
+        _countOfDataTask++;
     }
 }
 
 - (void)addNewCell:(ImageObject*)imageObject atIndexPath:(NSIndexPath*)indexPath {
-    [self.collectionView performBatchUpdates:^{
-        [self.showImages addObject:imageObject];
-        [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+    if (self.showImages.count == indexPath.row) {
+        [self.collectionView performBatchUpdates:^{
+            [self.showImages addObject:imageObject];
+            [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+        } completion:nil];
     }
-    completion:nil];
+    else {
+        [self clearCollectionView];
+    }
 }
 
 - (void)downloadImage:(NSString*)urlString
@@ -252,17 +268,8 @@ static NSString * const reuseIdentifier = @"BreedImage";
     
     NSURLSessionDownloadTask *downloadTask = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
-        if (![error.localizedDescription isEqualToString:@"cancelled"]) {
-            _countOfDataTask--;
-            if (!_countOfDataTask) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-                });
-            }
-        }
-        
-        if (_countOfDataTask < 0) {
-            // some go wrong
+        if ([error.localizedDescription isEqualToString:@"cancelled"]) {
+            return;
         }
         
         if (!location || error) {
@@ -274,7 +281,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
     
     [downloadTask resume];
     [self.downloadTasks addObject:downloadTask];
-    _countOfDataTask++;
 }
 
 - (void) showAddMoreButton {
@@ -312,6 +318,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
             [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
         }
         completion:nil];
+        _isShowAddMoreButton = NO;
     }
 }
 #pragma mark - GreedoCollectionViewLayoutDataSource
@@ -396,9 +403,9 @@ static NSString * const reuseIdentifier = @"BreedImage";
     
     if (_isShowAddMoreButton && indexPath.row == self.showImages.count-1) {
         [self removeAddMoreButton];
+        _leastToShowAddMore = _leastToShowAddMore + 10;
         [self.googleImage searchMore];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-        _isShowAddMoreButton = NO;
         return;
     }
     
@@ -472,7 +479,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
     pickTVC.listOfBreeds = self.googleImage.dogBreeds;
     pickTVC.typeOfBreed = Dog;
     pickTVC.delegate = self;
-    pickTVC.title = @"Pick a dog breed";
     self.pickTVC = pickTVC;
     
     UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
@@ -487,7 +493,6 @@ static NSString * const reuseIdentifier = @"BreedImage";
     pickTVC.listOfBreeds = self.googleImage.catBreeds;
     pickTVC.typeOfBreed = Cat;
     pickTVC.delegate = self;
-    pickTVC.title = @"Pick a cat breed";
     self.pickTVC = pickTVC;
     
     UINavigationController* nav = [[UINavigationController alloc]initWithRootViewController:pickTVC];
@@ -502,6 +507,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
     }
     self.downloadTasks = [NSMutableArray array];
     _countOfDataTask = 0;
+    _leastToShowAddMore = 10;
     
     self.sourceSizes = [NSMutableArray array];
     self.showImages = [NSMutableArray array];
@@ -513,7 +519,12 @@ static NSString * const reuseIdentifier = @"BreedImage";
 #pragma mark - SearchImagesDelegate
 
 - (void)foundImages:(NSArray<NSString *> *)images {
-    [self generateAllImage: images];
+    if (images && images.count > 0) {
+        [self generateAllImage: images];
+    }
+    else {
+        _leastToShowAddMore = -1;
+    }
 }
 
 - (void)parseReady:(NSArray<NSString *> *)breeds
@@ -531,7 +542,7 @@ static NSString * const reuseIdentifier = @"BreedImage";
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
-    NSString *text = @"Please Allow Photo Access";
+    NSString *text = @"Happy to see you";
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
                                  NSForegroundColorAttributeName: [UIColor darkGrayColor]};
@@ -540,17 +551,27 @@ static NSString * const reuseIdentifier = @"BreedImage";
 }
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView {
-    NSString *text = @"This allows you to share photos from your library and save photos to your camera roll.";
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
     paragraph.alignment = NSTextAlignmentCenter;
+    paragraph.firstLineHeadIndent = 10;
+    paragraph.paragraphSpacing = 10;
+    paragraph.headIndent = 5;
+    
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14.0f],
                                  NSForegroundColorAttributeName: [UIColor lightGrayColor],
                                  NSParagraphStyleAttributeName: paragraph};
     
-    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+    
+    NSString *textOne = @"You can search cat/dog breed images, just tap on one of left-top buttons.\n";
+    NSString *textTwo = @"Or you can search images with you own search request, just tap on right-top button.";
+    
+    NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:textOne attributes:attributes];
+    [string appendAttributedString:[[NSMutableAttributedString alloc] initWithString:textTwo attributes:attributes]];
+    
+    return string;
 }
 
 @end

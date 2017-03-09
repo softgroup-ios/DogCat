@@ -33,6 +33,13 @@ NSString* const cellIdentifier = @"pick_breed";
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
 
     self.clearsSelectionOnViewWillAppear = NO;
+    if (self.typeOfBreed == Cat) {
+        [self setupTitle:@"Select a Cat Breed"];
+    }
+    else if (self.typeOfBreed == Dog) {
+        [self setupTitle:@"Select a Dog Breed"];
+    }
+    
     UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAction:)];
     cancelButton.tintColor = [UIColor colorWithRed:0.28 green:0.28 blue:0.39 alpha:1.0];
     self.navigationItem.leftBarButtonItem = cancelButton;
@@ -66,6 +73,19 @@ NSString* const cellIdentifier = @"pick_breed";
         });
     }
 }
+
+- (void) setupTitle: (NSString*)text {
+    
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, 40)];
+    titleLabel.text = text;
+    titleLabel.font = [UIFont fontWithName:@"Kailasa" size:18.f];
+    titleLabel.backgroundColor = [UIColor clearColor];
+    titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    titleLabel.numberOfLines = 1;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.navigationItem.titleView = titleLabel;
+}
+
 
 #pragma mark - Search Action
 
@@ -148,6 +168,7 @@ NSString* const cellIdentifier = @"pick_breed";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.searchBar resignFirstResponder];
     [self dismissViewControllerAnimated:YES completion:nil];
     
     NSString *breed = [self.searchResult objectAtIndex:indexPath.item];

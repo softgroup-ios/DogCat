@@ -113,14 +113,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dot" translatesAutoresizingMaskIntoConstraints="NO" id="0yr-L5-rZ9">
-                                            <rect key="frame" x="8" y="13.5" width="17.5" height="17"/>
+                                            <rect key="frame" x="8" y="16" width="14" height="13"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" secondItem="0yr-L5-rZ9" secondAttribute="height" multiplier="1:1" id="vPy-OU-5Yc"/>
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dalmantin dog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p0q-5g-sKn">
-                                            <rect key="frame" x="35.5" y="10" width="123.5" height="23"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                            <rect key="frame" x="32" y="8" width="114" height="28"/>
+                                            <fontDescription key="fontDescription" name="Kailasa" family="Kailasa" pointSize="17"/>
                                             <color key="textColor" red="0.27843137254901962" green="0.27843137254901962" blue="0.39215686274509803" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -128,7 +128,7 @@
                                     <constraints>
                                         <constraint firstItem="p0q-5g-sKn" firstAttribute="centerY" secondItem="0yr-L5-rZ9" secondAttribute="centerY" id="6eo-zH-9Gl"/>
                                         <constraint firstAttribute="leadingMargin" secondItem="0yr-L5-rZ9" secondAttribute="leading" id="9p8-0O-HXz"/>
-                                        <constraint firstItem="0yr-L5-rZ9" firstAttribute="height" secondItem="ppm-RZ-bVA" secondAttribute="height" multiplier="0.4" id="Y69-6h-ZN4"/>
+                                        <constraint firstItem="0yr-L5-rZ9" firstAttribute="height" secondItem="ppm-RZ-bVA" secondAttribute="height" multiplier="0.3" id="Y69-6h-ZN4"/>
                                         <constraint firstItem="0yr-L5-rZ9" firstAttribute="centerY" secondItem="ppm-RZ-bVA" secondAttribute="centerY" id="ozH-V8-yTQ"/>
                                         <constraint firstItem="p0q-5g-sKn" firstAttribute="leading" secondItem="0yr-L5-rZ9" secondAttribute="trailing" constant="10" id="xgu-6h-5OA"/>
                                     </constraints>
@@ -260,7 +260,7 @@
     <resources>
         <image name="cat-icon" width="22" height="22"/>
         <image name="dog-icon" width="22" height="22"/>
-        <image name="dot" width="200" height="200"/>
+        <image name="dot" width="20" height="20"/>
         <image name="icon-search" width="22" height="22"/>
     </resources>
 </document>

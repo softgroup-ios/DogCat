@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina3_5" orientation="portrait">
+    <device id="ipad12_9" orientation="landscape">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -18,31 +19,54 @@
                         <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1366" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dog1600" translatesAutoresizingMaskIntoConstraints="NO" id="cbu-Vk-V9Y">
-                                <rect key="frame" x="0.0" y="80" width="320" height="320"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="and other picture" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="6" translatesAutoresizingMaskIntoConstraints="NO" id="fwj-3U-Jau">
+                                <rect key="frame" x="641" y="137" width="177.5" height="53.5"/>
+                                <fontDescription key="fontDescription" name="Kailasa" family="Kailasa" pointSize="14"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.52378531678082196" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="cbu-Vk-V9Y">
+                                <rect key="frame" x="112.5" y="190.5" width="1141" height="833.5"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="cbu-Vk-V9Y" secondAttribute="height" multiplier="1:1" id="G0c-WX-H98"/>
+                                    <constraint firstAttribute="width" secondItem="cbu-Vk-V9Y" secondAttribute="height" multiplier="2400:1752" id="MsU-dH-FfD"/>
                                 </constraints>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DogCat" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.20000000000000001" translatesAutoresizingMaskIntoConstraints="NO" id="gX6-N6-Djp">
+                                <rect key="frame" x="548" y="20" width="270" height="117"/>
+                                <fontDescription key="fontDescription" name="Kailasa" family="Kailasa" pointSize="46"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" priority="999" id="45N-Te-moS"/>
-                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Llm-lL-Icb" secondAttribute="bottom" id="r2J-Ym-PYW"/>
-                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="rIG-3A-nn1"/>
-                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="uc0-ox-QFi"/>
+                            <constraint firstItem="gX6-N6-Djp" firstAttribute="height" secondItem="cbu-Vk-V9Y" secondAttribute="height" multiplier="0.14" id="0cM-vC-pWL"/>
+                            <constraint firstItem="gX6-N6-Djp" firstAttribute="width" secondItem="cbu-Vk-V9Y" secondAttribute="width" multiplier="55:233" id="AvN-wW-OVx"/>
+                            <constraint firstAttribute="trailing" secondItem="cbu-Vk-V9Y" secondAttribute="trailing" priority="998" id="Dke-zS-nGH"/>
+                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="cbu-Vk-V9Y" secondAttribute="bottom" priority="999" id="G9D-xT-pBA"/>
+                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="top" priority="999" id="Kln-dt-NNf"/>
+                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Rem-UR-WUS"/>
+                            <constraint firstItem="gX6-N6-Djp" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="S7L-Xs-Q6r"/>
+                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" priority="998" id="ZOz-vO-SUk"/>
+                            <constraint firstItem="fwj-3U-Jau" firstAttribute="width" secondItem="gX6-N6-Djp" secondAttribute="width" multiplier="21:32" id="bfH-sm-hOH"/>
+                            <constraint firstItem="fwj-3U-Jau" firstAttribute="top" secondItem="gX6-N6-Djp" secondAttribute="bottom" id="df4-NS-L7f"/>
+                            <constraint firstItem="fwj-3U-Jau" firstAttribute="height" secondItem="gX6-N6-Djp" secondAttribute="height" multiplier="5:11" id="gjN-nD-hLL"/>
+                            <constraint firstItem="fwj-3U-Jau" firstAttribute="trailing" secondItem="gX6-N6-Djp" secondAttribute="trailing" id="hTk-VE-nuf"/>
+                            <constraint firstItem="gX6-N6-Djp" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Llm-lL-Icb" secondAttribute="bottom" id="jn7-or-Uzh"/>
+                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" priority="998" id="koK-l5-epa"/>
+                            <constraint firstItem="cbu-Vk-V9Y" firstAttribute="top" secondItem="fwj-3U-Jau" secondAttribute="bottom" id="mR0-SZ-hWb"/>
                         </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="231.8840579710145" y="412.50000000000006"/>
         </scene>
     </scenes>
     <resources>
-        <image name="dog1600" width="1600" height="1600"/>
+        <image name="logo" width="2400" height="1752"/>
     </resources>
 </document>
