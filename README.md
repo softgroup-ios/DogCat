@@ -1,6 +1,6 @@
 # DogCat
 
-[![Platform](http://img.shields.io/badge/platform-ios-red.svg?style=flat
+[![Platform](https://img.shields.io/badge/platform-ios-blue.svg?style=flat
 )](https://developer.apple.com/iphone/index.action)
 [![ObjectiveC](https://img.shields.io/badge/Objective--C-2.0-blue.svg)](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/Introduction/Introduction.html) 
 
